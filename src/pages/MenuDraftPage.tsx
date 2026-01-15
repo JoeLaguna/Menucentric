@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, AlertCircle, Coffee, Sun, Utensils, Moon, Check, Wand2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, AlertCircle, Coffee, Sun, Utensils, Moon, Wand2 } from 'lucide-react';
 import { useMenuStore } from '../store/useMenuStore';
 import { RECIPES } from '../data/recipes';
 import { RecipeCard } from '../components/RecipeCard';
