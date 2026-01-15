@@ -21,8 +21,7 @@ export const RecipeCard = ({ title, image, time, cost, tags, className, onClick 
         return (
             <span className="flex tracking-[1px]">
                 {[...Array(3)].map((_, i) => (
-                    <span key={i} className={i < level ? 'text-slate-700 font-bold' : 'text-slate-300'}
-                    >
+                    <span key={i} className={i < level ? 'text-slate-700 font-bold' : 'text-slate-300'} >
                         €
                     </span>
                 ))}
