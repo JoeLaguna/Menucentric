@@ -1,145 +1,217 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Sparkles, AlertCircle, Coffee, Sun, Utensils, Moon, Check, Wand2 } from 'lucide-react';
 import { useMenuStore } from '../store/useMenuStore';
 import { RECIPES } from '../data/recipes';
 import { RecipeCard } from '../components/RecipeCard';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Wand2, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
-const MEAL_TYPES = ['Desayuno', 'Media Mañana', 'Comida', 'Cena'];
+const CATEGORIES = [
+    { id: 'desayuno', title: 'Desayuno', tags: ['Desayuno'], icon: Coffee, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { id: 'media-manana', title: 'Media Mañana', tags: ['Desayuno', 'Snack', 'Rápido'], icon: Sun, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { id: 'comida', title: 'Comida', tags: ['Comida'], icon: Utensils, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { id: 'cena', title: 'Cena', tags: ['Cena'], icon: Moon, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+];
 
 export const MenuDraftPage = () => {
-    const { addPreference, preferences, activateMenu } = useMenuStore();
     const navigate = useNavigate();
-    const [selectedMeal, setSelectedMeal] = useState('Comida');
+    const activateMenu = useMenuStore((state) => state.activateMenu);
     const [isGenerating, setIsGenerating] = useState(false);
 
-    // Filter recipes by current meal tab
-    const filteredRecipes = useMemo(() => {
-        return RECIPES.filter(r => r.tags.includes(selectedMeal));
-    }, [selectedMeal]);
-
-    const handleToggle = (id: string) => {
-        const exists = preferences.find(p => p.recipeId === id && p.wantsThisWeek);
-        addPreference(id, !exists);
+    // Helper to get recipes for a category
+    const getRecipesForCategory = (categoryTags: string[]) => {
+        // Filter recipes that match AT LEAST one of the category tags
+        const filtered = RECIPES.filter(recipe =>
+            recipe.tags.some(tag => categoryTags.includes(tag))
+        );
+        // Return up to 7 recipes (shuffled or sliced)
+        return filtered.slice(0, 7);
     };
 
-    const handleCreateMenu = () => {
+    const handleGenerate = () => {
         setIsGenerating(true);
-        // Simulate "AI" processing time
+
+        // Wait for the magic animation
         setTimeout(() => {
             activateMenu();
-            setIsGenerating(false);
-            navigate('/home');
-        }, 2000); // 2 secons delay
+            navigate('/home', { state: { showConfetti: true } });
+        }, 3500);
     };
 
-    const selectedCount = preferences.length;
-
     return (
-        <div className="min-h-screen bg-slate-50 pb-24 md:pb-8 relative">
-            <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-4 md:px-8">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Diseña tu Menú</h1>
-                        <p className="text-slate-500 text-sm hidden md:block">Selecciona tus platos favoritos para esta semana</p>
-                    </div>
+        <div className="min-h-screen bg-slate-50 pb-24 relative">
+            <AnimatePresence>
+                {isGenerating && <MagicLoadingOverlay />}
+            </AnimatePresence>
 
+            {/* Header */}
+            <header className="bg-white border-b border-slate-100 sticky top-0 z-30 px-6 py-4 shadow-sm/50 backdrop-blur-md bg-white/90">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="text-right hidden sm:block">
-                            <span className="block text-2xl font-bold text-emerald-600 leading-none">{selectedCount}</span>
-                            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Platos</span>
-                        </div>
                         <button
-                            onClick={handleCreateMenu}
-                            disabled={selectedCount === 0}
-                            className={`
-                                flex items-center gap-2 px-6 py-3 rounded-xl font-bold shadow-lg transition-all
-                                ${selectedCount > 0
-                                    ? 'bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 shadow-emerald-200'
-                                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'}
-                            `}
+                            onClick={() => navigate(-1)}
+                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
                         >
-                            <Wand2 size={20} className={selectedCount > 0 ? "animate-pulse" : ""} />
-                            <span className="hidden md:inline">Generar Menú</span>
-                            <span className="md:hidden">Generar</span>
+                            <ArrowLeft size={22} />
                         </button>
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Borrador de Menú</h1>
+                            <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Semana del 12 al 18 de Enero
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                {/* Tabs */}
-                <div className="max-w-7xl mx-auto mt-6 overflow-x-auto scrollbar-hide">
-                    <div className="flex space-x-2 min-w-max pb-2">
-                        {MEAL_TYPES.map(type => (
-                            <button
-                                key={type}
-                                onClick={() => setSelectedMeal(type)}
-                                className={`
-                                    px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap
-                                    ${selectedMeal === type
-                                        ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
-                                        : 'bg-white text-slate-600 hover:bg-slate-100'}
-                                `}
-                            >
-                                {type}
-                            </button>
-                        ))}
-                    </div>
+                    <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-semibold shadow-lg shadow-slate-200 hover:bg-slate-800 transition-all hover:scale-105 active:scale-95">
+                        <Sparkles size={16} className="text-amber-400" />
+                        Autocompletar
+                    </button>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredRecipes.map(recipe => {
-                        const isSelected = preferences.some(p => p.recipeId === recipe.id && p.wantsThisWeek);
+            {/* Content Lists */}
+            <main className="max-w-[1600px] mx-auto py-8">
+                <div className="flex flex-col gap-12">
+                    {CATEGORIES.map((category) => {
+                        const recipes = getRecipesForCategory(category.tags);
+                        const Icon = category.icon;
+
                         return (
-                            <div key={recipe.id} className="relative group">
-                                <RecipeCard
-                                    title={recipe.name}
-                                    image={recipe.image}
-                                    time={recipe.time}
-                                    cost={recipe.cost || 1}
-                                    tags={recipe.tags}
-                                    onClick={() => handleToggle(recipe.id)}
-                                    className={isSelected ? 'ring-4 ring-emerald-500 ring-offset-2 scale-[0.98]' : ''}
-                                />
-                                {isSelected && (
-                                    <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        className="absolute top-4 right-4 bg-emerald-500 text-white p-2 rounded-full shadow-lg z-10"
-                                    >
-                                        <ArrowRight size={20} />
-                                    </motion.div>
-                                )}
-                            </div>
+                            <section key={category.id} className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <div className="px-6 sm:px-10 mb-6 flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl ${category.bg} flex items-center justify-center`}>
+                                        <Icon size={20} className={category.color} />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-slate-800 uppercase tracking-wide">
+                                        {category.title}
+                                    </h2>
+                                    <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
+                                        {recipes.length} opciones
+                                    </span>
+                                </div>
+
+                                <div className="overflow-x-auto pb-8 pt-2 px-6 sm:px-10 scrollbar-hide">
+                                    <div className="flex gap-6 min-w-min">
+                                        {recipes.length > 0 ? (
+                                            recipes.map((recipe, index) => (
+                                                <motion.div
+                                                    key={recipe.id}
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: index * 0.05 }}
+                                                    className="w-[280px] flex-shrink-0 snap-start"
+                                                >
+                                                    <RecipeCard
+                                                        title={recipe.name}
+                                                        image={recipe.image}
+                                                        time={recipe.time}
+                                                        cost={recipe.cost || 1}
+                                                        tags={recipe.tags}
+                                                        onClick={() => console.log('View recipe', recipe.id)}
+                                                    />
+                                                </motion.div>
+                                            ))
+                                        ) : (
+                                            <div className="w-full flex items-center justify-center p-12 bg-slate-100/50 rounded-3xl border border-dashed border-slate-200 text-slate-400">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <AlertCircle size={24} />
+                                                    <span className="font-medium">No hay recetas disponibles para esta categoría</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* "View More" Placeholder Card */}
+                                        {recipes.length > 0 && (
+                                            <div className="w-[100px] flex-shrink-0 flex items-center justify-center">
+                                                <button className="w-14 h-14 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:scale-110 transition-all group">
+                                                    <ArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" size={24} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
                         );
                     })}
                 </div>
             </main>
 
-            {/* Magic Loading Overlay */}
-            <AnimatePresence>
-                {isGenerating && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[60] bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center text-white"
+            {/* Floating Action Bar */}
+            <div className="fixed bottom-0 left-0 right-0 p-6 z-20 pointer-events-none">
+                <div className="max-w-xl mx-auto pointer-events-auto">
+                    <button
+                        onClick={handleGenerate}
+                        disabled={isGenerating}
+                        className="w-full bg-slate-900 text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-2xl shadow-slate-900/20 flex items-center justify-center gap-3 hover:bg-slate-800 hover:scale-[1.02] transition-all active:scale-95 ring-4 ring-white disabled:scale-100 disabled:opacity-80"
                     >
-                        <motion.div
-                            animate={{
-                                scale: [1, 1.2, 1],
-                                rotate: [0, 180, 360],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            className="bg-gradient-to-tr from-emerald-400 to-indigo-500 w-24 h-24 rounded-2xl mb-8 shadow-2xl shadow-emerald-500/50"
-                        />
-                        <h2 className="text-4xl font-black mb-4 tracking-tight">Cocinando tu Plan...</h2>
-                        <p className="text-slate-300 text-lg">Nuestra IA está organizando tu semana perfecta.</p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        {isGenerating ? (
+                            <Sparkles className="animate-spin" size={24} />
+                        ) : (
+                            <Wand2 size={24} className="text-purple-400" />
+                        )}
+                        {isGenerating ? 'Creando tu menú...' : 'Generar Plan Mágico'}
+                    </button>
+                </div>
+            </div>
         </div>
+    );
+};
+
+const MagicLoadingOverlay = () => {
+    const [step, setStep] = useState(0);
+    const steps = [
+        "Analizando tus preferencias...",
+        "Calculando balance nutricional...",
+        "Optimizando lista de la compra...",
+        "Aplicando un poco de magia...",
+        "¡Tu menú está listo!"
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setStep(s => (s < steps.length - 1 ? s + 1 : s));
+        }, 700);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-xl flex flex-col items-center justify-center text-white"
+        >
+            <div className="relative w-32 h-32 mb-8">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 rounded-full border-t-4 border-l-4 border-emerald-400/30"
+                />
+                <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-2 rounded-full border-b-4 border-r-4 border-purple-400/30"
+                />
+                <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: [1, 1.2, 1], opacity: 1 }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 flex items-center justify-center"
+                >
+                    <Sparkles size={48} className="text-yellow-400" />
+                </motion.div>
+            </div>
+
+            <motion.h2
+                key={step}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-purple-400 bg-clip-text text-transparent text-center px-4"
+            >
+                {steps[step]}
+            </motion.h2>
+        </motion.div>
     );
 };
