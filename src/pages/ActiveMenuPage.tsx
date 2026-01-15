@@ -1,228 +1,245 @@
+import { useState, useEffect } from 'react';
 import { useMenuStore } from '../store/useMenuStore';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { CalendarDays, Settings, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import type { Recipe } from '../types';
 import { RECIPES } from '../data/recipes';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, RefreshCw, ChefHat, CalendarDays, ArrowRight, Share2, Printer } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
+import { motion, AnimatePresence } from 'framer-motion';
+import clsx from 'clsx';
 import { MenuSkeleton } from '../components/MenuSkeleton';
 
+const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const MEALS = ['Desayuno', 'Media Mañana', 'Comida', 'Cena'];
+
+// Simulated dates generator
+const getDatesForWeek = () => {
+    const today = new Date();
+    // Assuming today is Thursday for the demo visual match, or just use real dates
+    // For visual fidelity with reference, let's generate dates starting from a Monday
+    const currentDay = today.getDay(); // 0 is Sunday
+    const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + distanceToMonday);
+
+    return DAYS.map((day, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return {
+            name: day,
+            date: d.getDate(),
+            month: d.toLocaleString('es-ES', { month: 'short' }),
+            isToday: i === 3 // Hardcoded Thursday as "Today" for visual demo match with reference image? Or actually use today: d.toDateString() === today.toDateString()
+        };
+    });
+};
+
 export const ActiveMenuPage = () => {
-    const { activeMenu, resetPreferences } = useMenuStore();
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(true);
-
-    // Simulate loading for Skeleton demo
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1200);
-        return () => clearTimeout(timer);
-    }, []);
-
-    // Effect for "New Menu" celebration
-    useEffect(() => {
-        // Check if we just landed here with a filled menu (could use a URL param or just existence)
-        if (!isLoading && activeMenu.length > 0) {
-            // Simple check to avoid spamming confetti on every refresh might be good, 
-            // but for now let's just trigger it once on mount if menu exists.
-            // confetti({
-            //     particleCount: 100,
-            //     spread: 70,
-            //     origin: { y: 0.6 }
-            // });
-        }
-    }, [activeMenu.length, isLoading]);
+    const location = useLocation();
+    const activeMenu = useMenuStore((state) => state.activeMenu);
 
 
-    const orderedRecipes = activeMenu
-        .map(p => RECIPES.find(r => r.id === p.recipeId))
-        .filter(r => r !== undefined);
-
-    // Generate days dynamically based on count
-    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-    // If not exactly 7, we just map 1-to-1 or loop. For MVP assume 7 or less.
-    const weeklyPlan = orderedRecipes.slice(0, 7).map((recipe, index) => ({
-        day: days[index] || `Día ${index + 1}`,
-        recipe
+    const weekDates = getDatesForWeek().map((d, i) => ({
+        ...d,
+        isToday: new Date().getDay() === (i + 1) % 7 // Simple check matching index
     }));
 
-    if (isLoading) {
+    // If we have confetti state, we assume we are coming from the magic generation
+    // and should show the skeleton load first.
+    const [isLoadingMagic, setIsLoadingMagic] = useState(!!location.state?.showConfetti);
+
+    useEffect(() => {
+        if (location.state?.showConfetti) {
+            // Trigger confetti
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            const frame = () => {
+                confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#34d399', '#ffbbf24', '#818cf8'] });
+                confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#34d399', '#ffbbf24', '#818cf8'] });
+
+                if (Date.now() < end) requestAnimationFrame(frame);
+            };
+            frame();
+
+            // Transition from Skeleton to Real content after delay
+            const timer = setTimeout(() => {
+                setIsLoadingMagic(false);
+            }, 2500);
+
+            // Clear state so it doesn't run again on simple re-renders
+            window.history.replaceState({}, document.title);
+
+            return () => clearTimeout(timer);
+        }
+    }, [location.state]);
+
+    // Map preferences to actual recipes
+    const activeRecipes = activeMenu
+        .map(p => RECIPES.find(r => r.id === p.recipeId))
+        .filter(Boolean) as Recipe[];
+
+    // Use similar mock distribution logic for now
+    const getRecipeForSlot = (dayIndex: number, mealIndex: number) => {
+        if (activeRecipes.length === 0) return null;
+        const seed = dayIndex + (mealIndex * 3);
+        const currentMealType = MEALS[mealIndex];
+        const categoryRecipes = activeRecipes.filter(r =>
+            r.tags.some(t => {
+                if (currentMealType === 'Desayuno') return t === 'Desayuno';
+                if (currentMealType === 'Media Mañana') return t === 'Snack' || t === 'Desayuno' || t === 'Rápido';
+                if (currentMealType === 'Comida') return t === 'Comida' || t === 'Legumbre';
+                if (currentMealType === 'Cena') return t === 'Cena' || t === 'Ligero';
+                return false;
+            })
+        );
+        const pool = categoryRecipes.length > 0 ? categoryRecipes : activeRecipes;
+        return pool[seed % pool.length];
+    };
+
+    if (activeRecipes.length === 0) {
         return (
-            <div className="p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen">
-                <header className="mb-8 pl-1">
-                    <div className="h-8 bg-slate-200 rounded w-48 mb-2 animate-pulse"></div>
-                    <div className="h-4 bg-slate-200 rounded w-64 animate-pulse"></div>
-                </header>
-                <MenuSkeleton />
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 text-center p-6">
+                <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                    <CalendarDays size={32} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900">No hay menú activo</h2>
+                <p className="text-slate-500 mb-6 max-w-xs">Activa un borrador para ver tu planificación semanal.</p>
+                <button onClick={() => navigate('/menu/draft')} className="text-emerald-600 font-semibold hover:underline">
+                    Ir al Borrador
+                </button>
             </div>
         )
     }
 
-    if (orderedRecipes.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
-                <div className="bg-slate-100 p-8 rounded-full mb-6">
-                    <CalendarDays size={64} className="text-slate-300" />
-                </div>
-                <h2 className="text-3xl font-bold text-slate-800 mb-3">Tu agenda está vacía</h2>
-                <p className="text-slate-500 max-w-md mb-8 leading-relaxed">
-                    Aún no tienes un menú activo para esta semana. ¡Vamos a planificar algo delicioso!
-                </p>
-                <div className="flex gap-4">
-                    <Link
-                        to="/tinder-mode"
-                        className="bg-emerald-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-600 hover:scale-105 transition-all flex items-center gap-2"
-                    >
-                        <ChefHat size={20} />
-                        Crear Menú Mágico
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="min-h-screen bg-slate-50 p-4 md:p-8 max-w-[1600px] mx-auto">
-            {/* Header Section */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+            {/* Header */}
+            <header className="bg-white px-6 py-4 flex items-center justify-between shadow-sm border-b border-slate-100 flex-shrink-0 z-10">
                 <div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight"
-                    >
-                        Tu Menú Semanal
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-slate-500 mt-2 font-medium"
-                    >
-                        Del {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })} al {new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
-                    </motion.p>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight 2xl:text-3xl transition-all">Plan Vegano</h1>
+                    <p className="text-xs text-slate-400 2xl:text-sm">by Jamie Oliver</p>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-3"
-                >
-                    <button className="bg-white text-slate-600 hover:text-emerald-600 hover:border-emerald-200 border border-slate-200 shadow-sm rounded-xl px-4 py-2.5 flex items-center gap-2 font-semibold transition-all text-sm">
-                        <Share2 size={18} />
-                        Compartir
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
+                        <button className="p-1 hover:bg-white rounded-md shadow-sm transition-all"><ChevronLeft size={16} className="text-slate-500" /></button>
+                        <span className="text-xs font-bold text-slate-600 px-2 2xl:text-sm">Semana 31</span>
+                        <button className="p-1 hover:bg-white rounded-md shadow-sm transition-all"><ChevronRight size={16} className="text-slate-500" /></button>
+                    </div>
+                    <button className="p-2 text-slate-400 hover:text-slate-600">
+                        <Settings size={20} className="2xl:w-6 2xl:h-6" />
                     </button>
-                    <button className="bg-white text-slate-600 hover:text-emerald-600 hover:border-emerald-200 border border-slate-200 shadow-sm rounded-xl px-4 py-2.5 flex items-center gap-2 font-semibold transition-all text-sm">
-                        <Printer size={18} />
-                        Imprimir
+                    <button className="p-2 text-slate-400 hover:text-slate-600">
+                        <Share2 size={20} className="2xl:w-6 2xl:h-6" />
                     </button>
-                    <Link
-                        to="/shopping-list"
-                        className="bg-slate-900 text-white hover:bg-slate-800 rounded-xl px-5 py-2.5 flex items-center gap-2 font-bold shadow-lg shadow-slate-200 transition-all text-sm"
-                    >
-                        <ShoppingCart size={18} />
-                        Ver Lista de Compra
-                    </Link>
-                </motion.div>
+                </div>
             </header>
 
-            {/* Horizontal Scroll / Grid Layout */}
-            <div className="overflow-x-auto pb-8 -mx-4 px-4 xl:px-0 scrollbar-hide">
-                <motion.div
-                    className="flex xl:grid xl:grid-cols-7 gap-6 min-w-max xl:min-w-0"
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                        visible: { transition: { staggerChildren: 0.05 } }
-                    }}
-                >
-                    {weeklyPlan.map((item, index) => (
+            {/* Content Area */}
+            <div className="flex-1 overflow-auto p-4 md:p-6 2xl:p-10 bg-slate-50/50">
+                <AnimatePresence mode="wait">
+                    {isLoadingMagic ? (
+                        <MenuSkeleton key="skeleton" />
+                    ) : (
                         <motion.div
-                            key={item.recipe?.id || index}
-                            variants={{
-                                hidden: { opacity: 0, y: 30 },
-                                visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 20 } }
-                            }}
-                            className="w-[280px] xl:w-auto flex flex-col group"
+                            key="content"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8 }}
+                            className="min-w-[1000px] xl:min-w-0 xl:w-full h-full grid grid-cols-7 gap-3 2xl:gap-6"
                         >
-                            {/* Day Header */}
-                            <div className="flex items-center justify-between mb-4 px-1">
-                                <h3 className="text-xl font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">
-                                    {item.day.slice(0, 3)}
-                                    <span className="text-slate-400 font-normal ml-1 hidden xl:inline">{item.day.slice(3)}</span>
-                                </h3>
-                                <div className="text-xs font-bold text-slate-300 bg-white border border-slate-100 px-2 py-1 rounded-md">
-                                    13:30
-                                </div>
-                            </div>
+                            {weekDates.map((day, dayIndex) => (
+                                <div
+                                    key={day.name}
+                                    className={clsx(
+                                        "rounded-2xl p-3 2xl:p-5 flex flex-col gap-3 2xl:gap-6 border transition-all h-full",
+                                        day.isToday
+                                            ? "bg-slate-800 border-slate-700 shadow-2xl shadow-slate-300 ring-4 ring-slate-200/50 scale-[1.01] z-10"
+                                            : "bg-white border-slate-100 hover:shadow-lg hover:border-slate-200"
+                                    )}
+                                >
+                                    {/* Column Header */}
+                                    <div className="mb-1 2xl:mb-4 text-center">
+                                        <p className={clsx(
+                                            "text-[10px] 2xl:text-sm font-bold uppercase tracking-wider mb-1",
+                                            day.isToday ? "text-emerald-400" : "text-slate-500"
+                                        )}>
+                                            {day.name} {day.date}
+                                        </p>
+                                        <h3 className={clsx(
+                                            "text-xs 2xl:text-xl font-black uppercase tracking-widest",
+                                            day.isToday ? "text-white" : "text-slate-900"
+                                        )}>
+                                            Desayuno
+                                        </h3>
+                                    </div>
 
-                            {/* Recipe Card - Vertical Layout */}
-                            {item.recipe ? (
-                                <Link to={`/recipe/${item.recipe.id}`} className="block relative h-[380px] rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white border border-slate-100">
-                                    <div className="h-[65%] w-full relative">
-                                        <img
-                                            src={item.recipe.image}
-                                            alt={item.recipe.name}
-                                            className="w-full h-full object-cover"
-                                            loading="lazy"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60"></div>
-                                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm text-slate-700">
-                                            <ChefHat size={16} />
-                                        </div>
+                                    {/* Meal Slots */}
+                                    <div className="flex-1 flex flex-col gap-3 2xl:gap-5">
+                                        {MEALS.map((mealType, mealIndex) => {
+                                            const recipe = getRecipeForSlot(dayIndex, mealIndex);
+                                            // Determine label (skip first as header covers it?)
+                                            // The design usually lists Breakfast items directly under "Breakfast" header.
+                                            // But for subsequent meals "Lunch", "Dinner", we need labels.
+                                            return (
+                                                <div key={mealType} className="flex flex-col gap-1 2xl:gap-2">
+                                                    {mealIndex > 0 && (
+                                                        <span className={clsx(
+                                                            "text-[9px] 2xl:text-xs font-black uppercase tracking-widest opacity-60",
+                                                            day.isToday ? "text-slate-400" : "text-slate-400"
+                                                        )}>
+                                                            {mealType === 'Media Mañana' ? 'Snack' : mealType}
+                                                        </span>
+                                                    )}
+                                                    <MenuCard recipe={recipe} isDark={day.isToday} />
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                    <div className="p-5 h-[35%] flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex gap-2 mb-2">
-                                                {item.recipe.tags.slice(0, 1).map(tag => (
-                                                    <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <h4 className="font-bold text-slate-900 leading-snug line-clamp-2 text-lg">
-                                                {item.recipe.name}
-                                            </h4>
-                                        </div>
-                                        <div className="flex items-center justify-between text-sm text-slate-500 font-medium pt-3 border-t border-slate-50">
-                                            <span>{item.recipe.time} min</span>
-                                            <span>{item.recipe.calories} kcal</span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ) : (
-                                <div className="h-[380px] rounded-[24px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:border-emerald-300 hover:text-emerald-500 hover:bg-emerald-50/30 transition-all cursor-pointer group/empty">
-                                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3 group-hover/empty:bg-emerald-100 group-hover/empty:scale-110 transition-all">
-                                        <span className="text-2xl">+</span>
-                                    </div>
-                                    <span className="text-sm font-bold">Añadir comida</span>
                                 </div>
-                            )}
+                            ))}
                         </motion.div>
-                    ))}
-                </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+    )
+}
+
+const MenuCard = ({ recipe, isDark }: { recipe: Recipe | null, isDark?: boolean }) => {
+    if (!recipe) return <div className={clsx("h-16 2xl:h-24 rounded-xl border-2 border-dashed opacity-50", isDark ? "border-slate-600 bg-slate-700" : "border-slate-200 bg-slate-50")}></div>;
+
+    return (
+        <div className={clsx(
+            "group flex items-center gap-3 p-2 2xl:p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-300",
+            isDark
+                ? "bg-slate-700/50 hover:bg-slate-700 border border-slate-600"
+                : "bg-white hover:shadow-md border border-slate-100 hover:border-emerald-200"
+        )}>
+            <div className="relative overflow-hidden rounded-lg w-12 h-12 2xl:w-20 2xl:h-20 flex-shrink-0">
+                <img
+                    src={recipe.image}
+                    alt={recipe.name}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                />
             </div>
 
-            {/* Global Actions Footer */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mt-12 pt-8 border-t border-slate-200 flex justify-center"
-            >
-                <button
-                    onClick={() => {
-                        if (confirm('¿Seguro que quieres borrar este menú y empezar de cero?')) {
-                            resetPreferences();
-                            navigate('/tinder-mode');
-                        }
-                    }}
-                    className="flex items-center gap-2 text-slate-400 hover:text-rose-500 font-medium px-4 py-2 rounded-lg hover:bg-rose-50 transition-colors text-sm"
-                >
-                    <RefreshCw size={16} />
-                    Reiniciar Semana
-                </button>
-            </motion.div>
+            <div className="min-w-0 flex-1">
+                <p className={clsx(
+                    "text-[11px] 2xl:text-base font-bold leading-tight line-clamp-2 mb-0.5",
+                    isDark ? "text-slate-100" : "text-slate-700"
+                )}>
+                    {recipe.name}
+                </p>
+                <p className={clsx(
+                    "text-[9px] 2xl:text-xs truncate font-medium",
+                    isDark ? "text-slate-400" : "text-slate-400"
+                )}>
+                    {recipe.tags[0]}
+                </p>
+            </div>
         </div>
-    );
-};
+    )
+}

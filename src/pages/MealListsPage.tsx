@@ -1,105 +1,118 @@
-import { Plus } from 'lucide-react';
-import { useMenuStore, type MealList } from '../store/useMenuStore';
+import { useMenuStore } from '../store/useMenuStore';
+import { Plus, ChevronRight, BookHeart, Utensils, Play, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { EmptyState } from '../components/EmptyState';
-import { BookHeart, Play, MoreHorizontal } from 'lucide-react';
+import clsx from 'clsx';
 
 export const MealListsPage = () => {
-    const { mealLists, createMealList } = useMenuStore();
+    const mealLists = useMenuStore((state) => state.mealLists);
+    const deleteMealList = useMenuStore((state) => state.deleteMealList);
 
-    const handleCreate = () => {
-        // For MVP, simplest "create" flow: alert prompt
-        const name = prompt('Nombre de la nueva lista:');
-        if (name) {
-            createMealList(name, 'Lista personalizada');
-        }
+    // Mock handler for creating new list (Phase 2: Use a real modal)
+    const handleCreateList = () => {
+        const createList = useMenuStore.getState().createMealList;
+        const name = prompt("Nombre de la nueva lista:");
+        if (name) createList(name, "Lista personalizada");
     };
 
-    if (mealLists.length === 0) {
-        return (
-            <div className="h-full">
-                <EmptyState
-                    icon={BookHeart}
-                    title="No tienes listas guardadas"
-                    description="Crea listas para organizar tus recetas favoritas, ideas para cenas o menús especiales."
-                    actionLabel="Crear mi primera lista"
-                    onAction={handleCreate}
-                />
-            </div>
-        );
-    }
-
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-screen">
-            <header className="flex justify-between items-end mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Mis Listas</h1>
-                    <p className="text-slate-500 mt-1">Colecciones de tus recetas favoritas</p>
-                </div>
-                <button
-                    onClick={handleCreate}
-                    className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
-                >
-                    <Plus size={20} />
-                    Nueva Lista
-                </button>
-            </header>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {mealLists.map((list) => (
-                    <ListCard key={list.id} list={list} />
-                ))}
-
-                {/* Create New Card Placeholder */}
-                <button
-                    onClick={handleCreate}
-                    className="group border-2 border-dashed border-slate-300 rounded-3xl p-6 flex flex-col items-center justify-center gap-4 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all min-h-[200px]"
-                >
-                    <div className="w-16 h-16 rounded-full bg-slate-100 group-hover:bg-emerald-100 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors">
-                        <Plus size={32} />
+        <div className="min-h-screen bg-slate-50 pb-24">
+            {/* Header */}
+            <header className="bg-white border-b border-slate-100 px-6 py-6 sticky top-0 z-10 shadow-sm">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900">Mis Listas</h1>
+                        <p className="text-sm text-slate-500">Tus colecciones de recetas favoritas.</p>
                     </div>
-                    <span className="font-bold text-slate-500 group-hover:text-emerald-700">Crear nueva lista</span>
-                </button>
-            </div>
-        </div>
-    );
-};
-
-const ListCard = ({ list }: { list: MealList }) => {
-    return (
-        <motion.div
-            whileHover={{ y: -5 }}
-            className="group relative bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all overflow-hidden border border-slate-100 flex flex-col h-full min-h-[240px]"
-        >
-            {/* Header / Cover */}
-            <div className={`h-24 bg-gradient-to-r ${list.gradient || 'from-slate-400 to-slate-500'} relative p-4 flex justify-end`}>
-                <button className="p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white transition-colors">
-                    <MoreHorizontal size={20} />
-                </button>
-            </div>
-
-            {/* Content offset overlapping header */}
-            <div className="px-6 flex-1 flex flex-col -mt-8">
-                <div className="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center text-3xl mb-3 border border-slate-50">
-                    {/* Emoji based on name guess? Or just icon */}
-                    {list.isSystem ? '⭐' : '🍲'}
-                </div>
-
-                <h3 className="text-xl font-bold text-slate-900 leading-tight mb-1">{list.name}</h3>
-                <p className="text-sm text-slate-500 line-clamp-2 mb-4">
-                    {list.description || 'Sin descripción'}
-                </p>
-
-                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between pb-6">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">
-                        {list.recipeIds.length} Recetas
-                    </span>
-
-                    <button className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
-                        <Play size={18} className="ml-1" />
+                    <button
+                        onClick={handleCreateList}
+                        className="p-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-colors shadow-lg active:scale-95"
+                    >
+                        <Plus size={24} />
                     </button>
                 </div>
+            </header>
+
+            {/* Content */}
+            <div className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Create New Card (Visual alternative to floating button) */}
+                    <button
+                        onClick={handleCreateList}
+                        className="group flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-2xl hover:border-emerald-400 hover:bg-emerald-50 transition-all min-h-[160px]"
+                    >
+                        <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3 group-hover:bg-white group-hover:text-emerald-500 group-hover:shadow-md transition-all">
+                            <Plus size={24} />
+                        </div>
+                        <span className="font-bold text-slate-400 group-hover:text-emerald-600">Nueva Lista</span>
+                    </button>
+
+                    {/* Meal Lists */}
+                    {mealLists.map((list) => (
+                        <motion.div
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            key={list.id}
+                            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-slate-100 group relative flex flex-col h-full min-h-[160px]"
+                        >
+                            {/* Colorful Header/Cover */}
+                            <div className={clsx("h-24 bg-gradient-to-r p-4 flex flex-col justify-between", list.gradient)}>
+                                <div className="flex justify-between items-start text-white/90">
+                                    <BookHeart size={20} />
+                                    {/* Action Menu (Delete) */}
+                                    {!list.isSystem && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (confirm('¿Borrar esta lista?')) deleteMealList(list.id);
+                                            }}
+                                            className="p-1.5 bg-black/20 rounded-full hover:bg-black/30 text-white transition-colors"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                                <h3 className="text-white font-bold text-lg leading-tight shadow-black/10 drop-shadow-md">
+                                    {list.name}
+                                </h3>
+                            </div>
+
+                            {/* Body */}
+                            <div className="p-4 flex-1 flex flex-col justify-between bg-white">
+                                <div>
+                                    <p className="text-xs text-slate-500 line-clamp-2 mb-3">
+                                        {list.description || "Sin descripción"}
+                                    </p>
+                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-50 w-fit px-2 py-1 rounded-md">
+                                        <Utensils size={12} />
+                                        <span>{list.recipeIds.length} Recetas</span>
+                                    </div>
+                                </div>
+
+                                {/* Action Footer */}
+                                <div className="mt-4 pt-3 border-t border-slate-50 flex items-center gap-2">
+                                    <button
+                                        className="flex-1 bg-slate-900 text-white text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-1.5 hover:bg-slate-800 transition-colors"
+                                        onClick={() => console.log('View List', list.id)}
+                                    >
+                                        Ver Platos <ChevronRight size={14} />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            // Future: Play Tinder mode with ONLY this list's items (or filtered)
+                                            console.log('Play List', list.id);
+                                        }}
+                                        className="w-8 h-8 flex items-center justify-center bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-200 transition-colors"
+                                        title="Generar Menú con esta lista"
+                                    >
+                                        <Play size={14} fill="currentColor" />
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
             </div>
-        </motion.div>
+        </div>
     );
 };

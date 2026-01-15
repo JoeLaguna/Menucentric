@@ -1,218 +1,199 @@
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMenuStore } from '../store/useMenuStore';
+import { Search, SlidersHorizontal, MapPin } from 'lucide-react';
 import { PlanCard } from '../components/PlanCard';
-import { Search, SlidersHorizontal, ArrowRight, Zap, Leaf, Heart, Trophy } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
 
+// Helper to get image path
+const getImg = (name: string) => `/images/plans/${name}`;
+
+// Data (Kept from original)
 const CATEGORIES = [
-  { id: 'all', label: 'Todo' },
-  { id: 'rapido', label: 'Rápido y Fácil' },
-  { id: 'fit', label: 'Fitness' },
-  { id: 'veggie', label: 'Vegetariano' },
-  { id: 'family', label: 'Familiar' },
-  { id: 'budget', label: 'Económico' },
-];
-
-const FEATURED_PLANS = [
-  {
-    id: 'plan-1',
-    title: 'Semana Mediterránea',
-    description: 'Platos frescos, ligeros y llenos de sabor. Ideal para el verano.',
-    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    tag: 'Popular'
-  },
-  {
-    id: 'plan-2',
-    title: 'Batch Cooking Domingo',
-    description: 'Cocina 2 horas, come toda la semana. Optimizado para tupper.',
-    image: 'https://images.unsplash.com/photo-1543362906-acfc16c67564?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    tag: 'Ahorro de Tiempo'
-  },
-  {
-    id: 'plan-3',
-    title: 'Keto para Principiantes',
-    description: 'Bajo en carbohidratos, alto en grasas saludables. Menú de introducción.',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    tag: 'Dieta'
-  },
-  {
-    id: 'plan-4',
-    title: 'Cenas en 15 Minutos',
-    description: 'Recetas express para terminar el día sin complicaciones.',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    tag: 'Express'
-  },
-  {
-    id: 'plan-5',
-    title: 'Vegetariano Gourmet',
-    description: 'Descubre que comer verduras no es aburrido. Platos de restaurante en casa.',
-    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    tag: 'Chef Choice'
-  },
-  {
-    id: 'plan-6',
-    title: 'Desayunos Energéticos',
-    description: 'Empieza el día con fuerza. Bowls, tostadas y batidos.',
-    image: 'https://images.unsplash.com/photo-1494859802809-d069c3b71a8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    tag: 'Mañanas'
-  }
+    {
+        id: 'fitness',
+        title: 'Fitness',
+        icon: '💪',
+        plans: [
+            { title: 'Ganancia Muscular', image: getImg('Fit2.jpg'), tag: 'Hipertrofia', description: 'Maximiza el crecimiento con alto contenido proteico.' },
+            { title: 'Desayunos Power', image: getImg('comiendo 3.jpg'), tag: 'Energía', description: 'Empieza el día con fuerza.' },
+            { title: 'Proteína Pura', image: getImg('Menu Proteico.jpg'), tag: 'Alto en Proteína', description: 'Fuentes de proteína magra de alta calidad.' },
+            { title: 'Fitness Semanal', image: getImg('coach1.jpg'), tag: 'Equilibrado', description: 'Entrenamiento y nutrición balanceada.' },
+            { title: 'Vida Fit', image: getImg('fit.jpg'), tag: 'Lifestyle', description: 'Comer sano no es aburrido.' },
+            { title: 'Consejos Coach', image: getImg('coach.jpg'), tag: 'Tips', description: 'Comidas pre y post entreno.' },
+        ]
+    },
+    {
+        id: 'quick',
+        title: 'Rápidas',
+        icon: '⚡',
+        plans: [
+            { title: 'Cenas 15\'', image: getImg('Comiendo facil.jpg'), tag: '15 min', description: 'Ligeras y sin estrés.' },
+            { title: 'Snacks', image: getImg('comiendo 2.jpeg'), tag: 'Saludable', description: 'Picar sin culpa.' },
+            { title: 'Bocados', image: getImg('comiendo 4.jpeg'), tag: 'On-the-go', description: 'Para cuando no hay tiempo.' },
+            { title: 'Express', image: getImg('Comiendo1.jpg'), tag: 'Rápido', description: 'Listas en un parpadeo.' },
+        ]
+    },
+    {
+        id: 'mediterranean',
+        title: 'Mediterránea',
+        icon: '🍅',
+        plans: [
+            { title: 'Dieta Mediterránea', image: getImg('mediterraneo.jpg'), tag: 'Clásico', description: 'Salud y sabor.' },
+            { title: 'Mar y Tierra', image: getImg('mediterraneo.jpg'), tag: 'Fresco', description: 'Lo mejor de dos mundos.' }, // Fallback image if needed
+            { title: 'Sabores del Mar', image: getImg('mediterranean_girl.jpg'), tag: 'Pescados', description: 'Frescura del océano.' },
+            { title: 'Recetas de Paula', image: getImg('paula1.jpg'), tag: 'Casero', description: 'Cocina con toque moderno.' },
+            { title: 'Clásicos de Mamá', image: getImg('cocinando.jpg'), tag: 'Tradición', description: 'Como en casa.' },
+            { title: 'Favoritos Emily', image: getImg('emily.jpg'), tag: 'Top', description: 'Amadas por la comunidad.' },
+        ]
+    },
+    {
+        id: 'vegetarian',
+        title: 'Veggie',
+        icon: '🥗',
+        plans: [
+            { title: 'Vegetariano Flex', image: getImg('fruta-y-verdura.jpg'), tag: 'Flex', description: 'Delicioso sin carne.' },
+            { title: 'Green Power', image: getImg('Meallist1.jpg'), tag: 'Vegano', description: 'Todo el poder de las plantas.' },
+        ]
+    },
+    {
+        id: 'family',
+        title: 'Familia',
+        icon: '👨‍👩‍👧‍👦',
+        plans: [
+            { title: 'Para Todos', image: getImg('familia.jpg'), tag: 'Familiar', description: 'Gustará a grandes y pequeños.' },
+            { title: 'Menú Familiar', image: getImg('Meallist2.jpg'), tag: 'Semanal', description: 'Planifica para toda la casa.' },
+        ]
+    },
+    {
+        id: 'smart',
+        title: 'Smart',
+        icon: '🧠',
+        plans: [
+            { title: 'Caprichos', image: getImg('mike-wilson-195742.jpg'), tag: 'Cheat', description: 'Porque te lo mereces.' },
+            { title: 'Noche de Cine', image: getImg('movie night.jpg'), tag: 'Fun', description: 'Para el maratón de series.' },
+            { title: 'Ahorro Total', image: getImg('MealList3.jpg'), tag: 'Económico', description: 'Bueno, bonito y barato.' },
+            { title: 'Inspiración', image: getImg('frase.jpg'), tag: 'Daily', description: 'Frases y motivación.' },
+        ]
+    }
 ];
 
 export const LandingPage = () => {
-  const navigate = useNavigate();
-  const { createMealList } = useMenuStore();
-  const [activeCategory, setActiveCategory] = useState('all');
+    const navigate = useNavigate();
+    const [activeCategory, setActiveCategory] = useState('all');
 
-  const handleCreateNew = () => {
-    // Logic to start fresh flow (Tinder Mode)
-    navigate('/onboarding');
-  };
+    // Flatten all plans for "All" view or filter by category
+    const displayedPlans = useMemo(() => {
+        if (activeCategory === 'all') {
+            return CATEGORIES.flatMap(cat => cat.plans.map(p => ({ ...p, categoryTitle: cat.title })));
+        }
+        return CATEGORIES.find(c => c.id === activeCategory)?.plans || [];
+    }, [activeCategory]);
 
-  return (
-    <div className="min-h-screen bg-white text-slate-900 pb-20">
-      {/* 1. Minimalist Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-              MenuCentric
-            </span>
-          </div>
+    return (
+        <div className="min-h-screen bg-white pb-24 font-sans">
+            {/* --- Header (Airbnb style) --- */}
+            <header className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm">
+                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
+                    {/* Brand */}
+                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+                        <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">M</div>
+                        <span className="text-emerald-600 font-extrabold text-xl tracking-tight hidden md:block">MenuCentric</span>
+                    </div>
 
-          {/* Search Bar - Desktop Centered */}
-          <div className="hidden md:flex flex-1 max-w-md relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-              <Search size={18} />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar recetas, planes, ingredientes..."
-              className="w-full bg-slate-100 hover:bg-slate-50 focus:bg-white text-sm text-slate-900 rounded-full py-2.5 pl-10 pr-4 outline-none ring-2 ring-transparent focus:ring-emerald-500/20 transition-all placeholder:text-slate-500"
-            />
-          </div>
+                    {/* Search Pill */}
+                    <div className="hidden md:flex flex-1 max-w-lg mx-auto bg-white border border-slate-200 rounded-full shadow-sm hover:shadow-md transition-shadow items-center p-1.5 pl-6 cursor-pointer">
+                        <div className="flex-1 flex items-center gap-2 divide-x divide-slate-200">
+                            <span className="text-sm font-semibold text-slate-900 line-clamp-1">Cualquier plan</span>
+                            <span className="text-sm font-semibold text-slate-900 px-4 line-clamp-1">Cualquier semana</span>
+                            <span className="text-sm text-slate-500 px-4 font-normal line-clamp-1">¿Cuántos sois?</span>
+                        </div>
+                        <div className="bg-emerald-500 rounded-full p-2.5 text-white">
+                            <Search size={16} strokeWidth={3} />
+                        </div>
+                    </div>
 
-          <div className="flex items-center gap-3">
-            <button className="md:hidden p-2 text-slate-600">
-              <Search size={20} />
-            </button>
-            <button
-              onClick={handleCreateNew}
-              className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all flex items-center gap-2 shadow-lg shadow-slate-200"
-            >
-              <Zap size={16} className="fill-yellow-400 text-yellow-400" />
-              <span className="hidden sm:inline">Crear Menú</span>
-              <span className="sm:hidden">Crear</span>
-            </button>
-          </div>
-        </div>
+                    {/* Mobile Search Placeholder */}
+                    <div className="md:hidden flex-1 flex items-center gap-3 bg-slate-100 rounded-full px-4 py-3">
+                        <Search size={18} className="text-slate-500" />
+                        <span className="text-slate-500 font-medium text-sm">Buscar planes...</span>
+                    </div>
 
-        {/* Categories Nav - Sticky under header */}
-        <div className="border-t border-slate-50 bg-white">
-          <div className="max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-hide">
-            <div className="flex items-center gap-1 py-3 min-w-max">
-              <button
-                className="p-2 mr-2 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50"
-                aria-label="Filtros"
-              >
-                <SlidersHorizontal size={16} />
-              </button>
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`
-                    px-4 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap border
-                    ${activeCategory === cat.id
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'}
-                  `}
-                >
-                  {cat.label}
+                    {/* User Actions */}
+                    <div className="flex items-center gap-2">
+                        <button className="hidden md:block text-sm font-bold text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-full transition-colors">
+                            Hazte Premium
+                        </button>
+                        <div className="flex items-center gap-2 border border-slate-200 rounded-full p-1 pl-3 hover:shadow-md transition-shadow cursor-pointer">
+                            <SlidersHorizontal size={16} className="text-slate-600" />
+                            <div className="w-8 h-8 bg-slate-500 rounded-full text-white flex items-center justify-center text-xs">J</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* --- Category Filter Bar --- */}
+                <div className="max-w-7xl mx-auto px-6 pt-4 pb-0">
+                    <div className="flex items-center gap-8 overflow-x-auto scrollbar-hide pb-4">
+                        {/* 'All' Tab */}
+                        <button
+                            onClick={() => setActiveCategory('all')}
+                            className={`flex flex-col items-center gap-2 min-w-[64px] cursor-pointer group ${activeCategory === 'all' ? 'text-black' : 'text-slate-500 hover:text-slate-800'}`}
+                        >
+                            <span className={`text-2xl transition-transform ${activeCategory === 'all' ? 'scale-110' : 'group-hover:scale-110'}`}>🌍</span>
+                            <span className={`text-xs font-bold whitespace-nowrap pb-2 border-b-2 transition-colors ${activeCategory === 'all' ? 'border-black' : 'border-transparent group-hover:border-slate-300'}`}>
+                                Todos
+                            </span>
+                        </button>
+
+                        {CATEGORIES.map(cat => (
+                            <button
+                                key={cat.id}
+                                onClick={() => setActiveCategory(cat.id)}
+                                className={`flex flex-col items-center gap-2 min-w-[64px] cursor-pointer group ${activeCategory === cat.id ? 'text-black' : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                <span className={`text-2xl transition-transform ${activeCategory === cat.id ? 'scale-110' : 'group-hover:scale-110'}`}>
+                                    {cat.icon}
+                                </span>
+                                <span className={`text-xs font-bold whitespace-nowrap pb-2 border-b-2 transition-colors ${activeCategory === cat.id ? 'border-black' : 'border-transparent group-hover:border-slate-300'}`}>
+                                    {cat.title}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </header>
+
+            {/* --- Mobile Floating Map Toggle Mock --- */}
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 md:hidden">
+                <button className="bg-slate-900 text-white px-5 py-3 rounded-full font-bold shadow-xl flex items-center gap-2 text-sm">
+                    Map <MapPin size={14} />
                 </button>
-              ))}
             </div>
-          </div>
+
+            {/* --- Main Grid --- */}
+            <main className="max-w-[1920px] mx-auto px-6 py-8">
+                {/* Section Title (Optional, helpful context) */}
+                <div className="mb-6 flex items-center justify-between">
+                    <p className="text-slate-900 font-bold text-lg">
+                        {activeCategory === 'all' ? 'Explora todos los planes' : `Planes de ${CATEGORIES.find(c => c.id === activeCategory)?.title}`}
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
+                    {displayedPlans.map((plan, i) => (
+                        <PlanCard
+                            key={`${activeCategory}-${i}`}
+                            {...plan}
+                            className="w-full"
+                            onClick={() => navigate('/tinder-mode')}
+                        />
+                    ))}
+                </div>
+
+                {displayedPlans.length === 0 && (
+                    <div className="text-center py-20">
+                        <p className="text-slate-400">No se encontraron planes en esta categoría.</p>
+                    </div>
+                )}
+            </main>
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 pt-8">
-
-        {/* Hero / Promo Section (Optional, keep it small or remove for pure 'Airbnb' grid feel. Let's do a small banner) */}
-        <motion.div
-            initial={{opacity: 0, y: 20}}
-            animate={{opacity: 1, y: 0}} 
-            className="mb-12 rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-8 sm:p-12 text-white relative overflow-hidden"
-        >
-             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-             <div className="relative z-10 max-w-xl">
-                 <h1 className="text-3xl sm:text-5xl font-bold mb-4 leading-tight">Cocina mejor, <br/> vive mejor.</h1>
-                 <p className="text-indigo-100 text-lg mb-8 font-medium">Descubre planes de comida diseñados por expertos o crea el tuyo propio en segundos con nuestra IA.</p>
-                 <button 
-                    onClick={handleCreateNew}
-                    className="bg-white text-indigo-600 font-bold px-8 py-3 rounded-full hover:scale-105 transition-transform shadow-xl"
-                 >
-                     Empezar Ahora
-                 </button>
-             </div>
-        </motion.div>
-
-        {/* Section Title */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Planes Populares</h2>
-          <button className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
-            Ver todos <ArrowRight size={16} />
-          </button>
-        </div>
-
-        {/* Grid Layout - Responsive Masonry-ish */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
-          {FEATURED_PLANS.map((plan, i) => (
-            <motion.div
-              key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <PlanCard
-                title={plan.title}
-                description={plan.description}
-                image={plan.image}
-                tag={plan.tag}
-              />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Additional Section - "Quick Picks" or similar to break up the grid */}
-        <div className="mt-20 mb-12">
-             <div className="flex items-center gap-3 mb-8">
-                 <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
-                     <Trophy size={24} />
-                 </div>
-                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900">Top Chefs de la Semana</h2>
-                    <p className="text-slate-500">Recetas creadas por nuestra comunidad</p>
-                 </div>
-             </div>
-             
-             {/* Simple horizontal scroll for contrast */}
-             <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide -mx-4 px-4">
-                 {/* Placeholders for chefs/users */}
-                 {[1,2,3,4,5].map(i => (
-                     <div key={i} className="min-w-[200px] bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col items-center text-center hover:bg-white hover:shadow-lg transition-all cursor-pointer">
-                         <div className="w-20 h-20 rounded-full bg-slate-200 mb-3 overflow-hidden">
-                            <img src={`https://i.pravatar.cc/150?u=${i+20}`} alt="User" />
-                         </div>
-                         <h3 className="font-bold text-slate-800">Chef Name</h3>
-                         <span className="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full mt-1">Superhost</span>
-                     </div>
-                 ))}
-             </div>
-        </div>
-
-      </main>
-    </div>
-  );
+    );
 };
