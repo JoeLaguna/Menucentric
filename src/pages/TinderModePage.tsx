@@ -1,5 +1,5 @@
 import { useState, useRef, createRef, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { TinderCard } from '../components/TinderCard';
 import { RecipeDetailsModal } from '../components/RecipeDetailsModal';
 import { useMenuStore } from '../store/useMenuStore';
@@ -80,13 +80,13 @@ const MenuCard = ({ recipe, isDark }: { recipe: Recipe, isDark?: boolean }) => (
 );
 
 // A background that mirrors the actual ActiveMenuPage structure
-const RealMenuBackground = () => {
+const RealMenuBackground = ({ title = "Plan Vegano" }: { title?: string }) => {
     return (
         <div className="w-full h-full flex flex-col bg-slate-50/50 p-6 md:p-8 2xl:p-12 overflow-hidden opacity-100">
             {/* Header Mock */}
             <div className="mb-8 flex items-center justify-between opacity-50">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Plan Vegano</h1>
+                    <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
                     <p className="text-xs text-slate-400">by MenuCentric AI</p>
                 </div>
                 <div className="flex gap-2">
@@ -183,15 +183,15 @@ const MockCalendarBackground = () => (
 );
 
 
-const BackgroundWrapper = ({ children, maxWidth = "max-w-md 2xl:max-w-xl" }: { children: React.ReactNode, maxWidth?: string }) => (
+const BackgroundWrapper = ({ children, maxWidth = "max-w-md 2xl:max-w-xl", planTitle }: { children: React.ReactNode, maxWidth?: string, planTitle?: string }) => (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white overflow-hidden">
         {/* Background Menu to simulate context */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-            <RealMenuBackground />
+            <RealMenuBackground title={planTitle} />
         </div>
 
-        {/* Overlay for focus - Lighter blur as requested */}
-        <div className="absolute inset-0 z-0 bg-slate-900/40 backdrop-blur-[1px] pointer-events-none" />
+        {/* Overlay for focus - Darker and No Blur as requested */}
+        <div className="absolute inset-0 z-0 bg-slate-900/80 pointer-events-none" />
 
         {/* Modal */}
         <div className={`z-10 w-full ${maxWidth} transition-all duration-300 relative`}>
@@ -200,7 +200,7 @@ const BackgroundWrapper = ({ children, maxWidth = "max-w-md 2xl:max-w-xl" }: { c
     </div>
 );
 
-const IntroModal = ({ onNext }: { onNext: () => void }) => {
+const IntroModal = ({ onNext, planTitle, planImage }: { onNext: () => void, planTitle?: string, planImage?: string }) => {
     // Mock data for the "Some recipes" strip
     const sampleRecipes = RECIPES.slice(0, 4);
 
@@ -224,7 +224,7 @@ const IntroModal = ({ onNext }: { onNext: () => void }) => {
 
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2 leading-tight">
                         Tu Menú Semanal <br />
-                        <span className="text-emerald-500">Saludable & Fácil</span>
+                        <span className="text-emerald-500">{planTitle || "Saludable & Fácil"}</span>
                     </h1>
                     <p className="text-slate-400 text-sm font-medium mb-6 uppercase tracking-wide">by MenuCentric AI</p>
 
@@ -267,9 +267,9 @@ const IntroModal = ({ onNext }: { onNext: () => void }) => {
                 {/* Hero Image */}
                 <div className="rounded-2xl overflow-hidden shadow-md mb-8 h-64 md:h-auto flex-1 relative group">
                     <img
-                        src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                        src={planImage || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        alt="Healthy Food"
+                        alt={planTitle || "Healthy Food"}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                 </div>
@@ -451,6 +451,9 @@ const DraftReviewOverlay = ({ preferences, onGenerate, _onEdit }: { preferences:
             {/* Background "Calendar" Hint */}
             <MockCalendarBackground />
 
+            {/* Overlay for consistency - Darker and No Blur */}
+            <div className="absolute inset-0 z-0 bg-slate-900/80 pointer-events-none" />
+
             {/* Content Container (Center Modal) */}
             <div className="flex-1 flex items-center justify-center p-4 md:p-8 2xl:p-16 overflow-y-auto z-10">
                 <motion.div
@@ -518,6 +521,9 @@ const DraftReviewOverlay = ({ preferences, onGenerate, _onEdit }: { preferences:
 
 export const TinderModePage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { planTitle, planImage } = location.state || {};
+
     const initialDeck = useMemo(() => buildDeck(), []);
 
     const [deck, setDeck] = useState<DeckItem[]>(initialDeck);
@@ -601,7 +607,7 @@ export const TinderModePage = () => {
 
     const handleGenerateMenu = () => {
         activateMenu();
-        navigate('/home', { state: { showConfetti: true } });
+        navigate('/home', { state: { showConfetti: true, planTitle } });
     };
 
     // Check for end of deck
@@ -615,15 +621,15 @@ export const TinderModePage = () => {
     // Step Rendering
     if (step === 'intro') {
         return (
-            <BackgroundWrapper maxWidth="max-w-5xl">
-                <IntroModal onNext={() => setStep('people')} />
+            <BackgroundWrapper maxWidth="max-w-5xl" planTitle={planTitle}>
+                <IntroModal onNext={() => setStep('people')} planTitle={planTitle} planImage={planImage} />
             </BackgroundWrapper>
         )
     }
 
     if (step === 'people') {
         return (
-            <BackgroundWrapper>
+            <BackgroundWrapper planTitle={planTitle}>
                 <ConfigPeopleModal onNext={(val) => {
                     console.log('People:', val); // Persist if needed
                     setStep('meals');
@@ -634,7 +640,7 @@ export const TinderModePage = () => {
 
     if (step === 'meals') {
         return (
-            <BackgroundWrapper>
+            <BackgroundWrapper planTitle={planTitle}>
                 <ConfigMealsModal onNext={(val) => {
                     console.log('Meals per day:', val); // Persist if needed
                     setStep('swiping');
