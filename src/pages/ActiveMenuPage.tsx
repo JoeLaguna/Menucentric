@@ -118,7 +118,7 @@ export const ActiveMenuPage = () => {
             {/* Header */}
             <header className="bg-white px-6 py-4 flex items-center justify-between shadow-sm border-b border-slate-100 flex-shrink-0 z-10">
                 <div>
-                    <h1 className="text-xl font-bold text-slate-900 tracking-tight 2xl:text-3xl transition-all">Plan Vegano</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight 2xl:text-3xl transition-all">{location.state?.planTitle || "Plan Personalizado"}</h1>
                     <p className="text-xs text-slate-400 2xl:text-sm">by Jamie Oliver</p>
                 </div>
 
@@ -243,5 +243,3 @@ const MenuCard = ({ recipe, isDark }: { recipe: Recipe | null, isDark?: boolean 
         </div>
     )
 }
-
-
