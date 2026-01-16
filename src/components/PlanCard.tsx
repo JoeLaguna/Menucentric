@@ -43,7 +43,7 @@ export const PlanCard = ({
                 </div>
 
                 {tag && (
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-sm">
+                    <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-md shadow-sm">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-900">
                             {tag}
                         </span>
