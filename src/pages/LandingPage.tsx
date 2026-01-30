@@ -183,7 +183,12 @@ export const LandingPage = () => {
                             key={`${activeCategory}-${i}`}
                             {...plan}
                             className="w-full"
-                            onClick={() => navigate('/tinder-mode')}
+                            onClick={() => navigate('/plan-preview', {
+                                state: {
+                                    planTitle: plan.title,
+                                    planImage: plan.image
+                                }
+                            })}
                         />
                     ))}
                 </div>

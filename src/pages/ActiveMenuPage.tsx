@@ -5,9 +5,9 @@ import { CalendarDays, Settings, ChevronLeft, ChevronRight, Share2 } from 'lucid
 import type { Recipe } from '../types';
 import { RECIPES } from '../data/recipes';
 import confetti from 'canvas-confetti';
-import { motion, AnimatePresence } from 'framer-motion';
-import clsx from 'clsx';
+import { AnimatePresence } from 'framer-motion';
 import { MenuSkeleton } from '../components/MenuSkeleton';
+import { WeeklyGrid } from '../components/WeeklyGrid';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const MEALS = ['Desayuno', 'Media Mañana', 'Comida', 'Cena'];
@@ -118,7 +118,7 @@ export const ActiveMenuPage = () => {
             {/* Header */}
             <header className="bg-white px-6 py-4 flex items-center justify-between shadow-sm border-b border-slate-100 flex-shrink-0 z-10">
                 <div>
-                    <h1 className="text-xl font-bold text-slate-900 tracking-tight 2xl:text-3xl transition-all">Plan Vegano</h1>
+                    <h1 className="text-xl font-bold text-slate-900 tracking-tight 2xl:text-3xl transition-all">{location.state?.planTitle || "Plan Personalizado"}</h1>
                     <p className="text-xs text-slate-400 2xl:text-sm">by Jamie Oliver</p>
                 </div>
 
@@ -143,64 +143,10 @@ export const ActiveMenuPage = () => {
                     {isLoadingMagic ? (
                         <MenuSkeleton key="skeleton" />
                     ) : (
-                        <motion.div
-                            key="content"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8 }}
-                            className="min-w-[1000px] xl:min-w-0 xl:w-full h-full grid grid-cols-7 gap-3 2xl:gap-6"
-                        >
-                            {weekDates.map((day, dayIndex) => (
-                                <div
-                                    key={day.name}
-                                    className={clsx(
-                                        "rounded-2xl p-3 2xl:p-5 flex flex-col gap-3 2xl:gap-6 border transition-all h-full",
-                                        day.isToday
-                                            ? "bg-slate-800 border-slate-700 shadow-2xl shadow-slate-300 ring-4 ring-slate-200/50 scale-[1.01] z-10"
-                                            : "bg-white border-slate-100 hover:shadow-lg hover:border-slate-200"
-                                    )}
-                                >
-                                    {/* Column Header */}
-                                    <div className="mb-1 2xl:mb-4 text-center">
-                                        <p className={clsx(
-                                            "text-[10px] 2xl:text-sm font-bold uppercase tracking-wider mb-1",
-                                            day.isToday ? "text-emerald-400" : "text-slate-500"
-                                        )}>
-                                            {day.name} {day.date}
-                                        </p>
-                                        <h3 className={clsx(
-                                            "text-xs 2xl:text-xl font-black uppercase tracking-widest",
-                                            day.isToday ? "text-white" : "text-slate-900"
-                                        )}>
-                                            Desayuno
-                                        </h3>
-                                    </div>
-
-                                    {/* Meal Slots */}
-                                    <div className="flex-1 flex flex-col gap-3 2xl:gap-5">
-                                        {MEALS.map((mealType, mealIndex) => {
-                                            const recipe = getRecipeForSlot(dayIndex, mealIndex);
-                                            // Determine label (skip first as header covers it?)
-                                            // The design usually lists Breakfast items directly under "Breakfast" header.
-                                            // But for subsequent meals "Lunch", "Dinner", we need labels.
-                                            return (
-                                                <div key={mealType} className="flex flex-col gap-1 2xl:gap-2">
-                                                    {mealIndex > 0 && (
-                                                        <span className={clsx(
-                                                            "text-[9px] 2xl:text-xs font-black uppercase tracking-widest opacity-60",
-                                                            day.isToday ? "text-slate-400" : "text-slate-400"
-                                                        )}>
-                                                            {mealType === 'Media Mañana' ? 'Snack' : mealType}
-                                                        </span>
-                                                    )}
-                                                    <MenuCard recipe={recipe} isDark={day.isToday} />
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ))}
-                        </motion.div>
+                        <WeeklyGrid
+                            dates={weekDates}
+                            getRecipeForSlot={getRecipeForSlot}
+                        />
                     )}
                 </AnimatePresence>
             </div>
@@ -208,40 +154,6 @@ export const ActiveMenuPage = () => {
     )
 }
 
-const MenuCard = ({ recipe, isDark }: { recipe: Recipe | null, isDark?: boolean }) => {
-    if (!recipe) return <div className={clsx("h-16 2xl:h-24 rounded-xl border-2 border-dashed opacity-50", isDark ? "border-slate-600 bg-slate-700" : "border-slate-200 bg-slate-50")}></div>;
 
-    return (
-        <div className={clsx(
-            "group flex items-center gap-3 p-2 2xl:p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-300",
-            isDark
-                ? "bg-slate-700/50 hover:bg-slate-700 border border-slate-600"
-                : "bg-white hover:shadow-md border border-slate-100 hover:border-emerald-200"
-        )}>
-            <div className="relative overflow-hidden rounded-lg w-12 h-12 2xl:w-20 2xl:h-20 flex-shrink-0">
-                <img
-                    src={recipe.image}
-                    alt={recipe.name}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                />
-            </div>
-
-            <div className="min-w-0 flex-1">
-                <p className={clsx(
-                    "text-[11px] 2xl:text-base font-bold leading-tight line-clamp-2 mb-0.5",
-                    isDark ? "text-slate-100" : "text-slate-700"
-                )}>
-                    {recipe.name}
-                </p>
-                <p className={clsx(
-                    "text-[9px] 2xl:text-xs truncate font-medium",
-                    isDark ? "text-slate-400" : "text-slate-400"
-                )}>
-                    {recipe.tags[0]}
-                </p>
-            </div>
-        </div>
-    )
-}
 
 

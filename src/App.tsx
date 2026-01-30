@@ -13,6 +13,7 @@ import { ActiveMenuPage } from './pages/ActiveMenuPage';
 import { ShoppingListPage } from './pages/ShoppingListPage';
 import { MealListsPage } from './pages/MealListsPage';
 import { PageTransition } from './components/PageTransition';
+import { PlanPreviewPage } from './pages/PlanPreviewPage';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -39,6 +40,11 @@ function AnimatedRoutes() {
           <Route path="/home" element={
             <PageTransition>
               <ActiveMenuPage />
+            </PageTransition>
+          } />
+          <Route path="/plan-preview" element={
+            <PageTransition>
+              <PlanPreviewPage />
             </PageTransition>
           } />
           <Route path="/tinder-mode" element={

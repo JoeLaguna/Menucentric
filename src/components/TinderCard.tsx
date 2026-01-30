@@ -74,12 +74,12 @@ export const TinderCard = forwardRef<TinderCardRef, TinderCardProps>(({ recipe, 
         >
             {/* Visual Feedback Overlays */}
             <motion.div style={{ opacity: likeOpacity }} className="absolute top-8 left-8 z-30 pointer-events-none">
-                <div className="border-4 border-emerald-500 rounded-xl px-4 py-2 -rotate-12 bg-white/30 backdrop-blur-md shadow-lg">
+                <div className="border-4 border-emerald-500 rounded-xl px-4 py-2 -rotate-12 bg-white/50 shadow-lg">
                     <span className="text-4xl font-black text-emerald-500 tracking-wider">LIKE</span>
                 </div>
             </motion.div>
             <motion.div style={{ opacity: nopeOpacity }} className="absolute top-8 right-8 z-30 pointer-events-none">
-                <div className="border-4 border-rose-500 rounded-xl px-4 py-2 rotate-12 bg-white/30 backdrop-blur-md shadow-lg">
+                <div className="border-4 border-rose-500 rounded-xl px-4 py-2 rotate-12 bg-white/50 shadow-lg">
                     <span className="text-4xl font-black text-rose-500 tracking-wider">NOPE</span>
                 </div>
             </motion.div>
@@ -102,7 +102,7 @@ export const TinderCard = forwardRef<TinderCardRef, TinderCardProps>(({ recipe, 
                         e.stopPropagation();
                         onShowDetails?.();
                     }}
-                    className="absolute top-5 right-5 w-11 h-11 bg-white/90 backdrop-blur-sm shadow-lg rounded-full flex items-center justify-center text-slate-700 hover:scale-110 hover:bg-white transition-all z-20 group-hover:shadow-emerald-500/20"
+                    className="absolute top-5 right-5 w-11 h-11 bg-white/95 shadow-lg rounded-full flex items-center justify-center text-slate-700 hover:scale-110 hover:bg-white transition-all z-20 group-hover:shadow-emerald-500/20"
                 >
                     <Info size={22} strokeWidth={2.5} />
                 </button>

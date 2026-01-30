@@ -180,7 +180,7 @@ const MagicLoadingOverlay = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-xl flex flex-col items-center justify-center text-white"
+            className="fixed inset-0 z-50 bg-slate-900/95 flex flex-col items-center justify-center text-white"
         >
             <div className="relative w-32 h-32 mb-8">
                 <motion.div
