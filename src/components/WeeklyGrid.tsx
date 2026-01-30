@@ -23,13 +23,13 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot }: WeeklyGridProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="min-w-[1000px] xl:min-w-0 xl:w-full h-full grid grid-cols-7 gap-3 2xl:gap-6"
+            className="w-full min-w-0 h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3 2xl:gap-6 pb-20 lg:pb-0"
         >
             {dates.map((day, dayIndex) => (
                 <div
                     key={day.name}
                     className={clsx(
-                        "rounded-2xl p-3 2xl:p-5 flex flex-col gap-3 2xl:gap-6 border transition-all h-full",
+                        "rounded-2xl p-3 2xl:p-4 flex flex-col gap-3 2xl:gap-6 border transition-all h-full",
                         day.isToday
                             ? "bg-slate-800 border-slate-700 shadow-2xl shadow-slate-300 ring-4 ring-slate-200/50 scale-[1.01] z-10"
                             : "bg-white border-slate-100 hover:shadow-lg hover:border-slate-200"

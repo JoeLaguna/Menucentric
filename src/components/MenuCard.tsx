@@ -14,12 +14,12 @@ export const MenuCard = ({ recipe, isDark, onClick }: MenuCardProps) => {
         <div
             onClick={onClick}
             className={clsx(
-                "group flex items-center gap-3 p-2 2xl:p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-300",
+                "group flex items-center gap-2 md:gap-3 p-2 2xl:p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-300",
                 isDark
                     ? "bg-slate-700/50 hover:bg-slate-700 border border-slate-600"
                     : "bg-white hover:shadow-md border border-slate-100 hover:border-emerald-200"
             )}>
-            <div className="relative overflow-hidden rounded-lg w-12 h-12 2xl:w-20 2xl:h-20 flex-shrink-0">
+            <div className="relative overflow-hidden rounded-lg w-10 h-10 md:w-12 md:h-12 2xl:w-14 2xl:h-14 flex-shrink-0">
                 <img
                     src={recipe.image}
                     alt={recipe.name}
@@ -27,15 +27,19 @@ export const MenuCard = ({ recipe, isDark, onClick }: MenuCardProps) => {
                 />
             </div>
 
-            <div className="min-w-0 flex-1">
+            {/* Content Container - Takes remaining space */}
+            <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <p className={clsx(
-                    "text-[11px] 2xl:text-base font-bold leading-tight line-clamp-2 mb-0.5",
+                    "font-bold leading-tight mb-0.5 break-words",
+                    "text-[10px] md:text-[11px] 2xl:text-sm", // Reduced from text-base to text-sm for better fit
+                    "line-clamp-2",
                     isDark ? "text-slate-100" : "text-slate-700"
                 )}>
                     {recipe.name}
                 </p>
                 <p className={clsx(
-                    "text-[9px] 2xl:text-xs truncate font-medium",
+                    "truncate font-medium",
+                    "text-[9px] 2xl:text-xs",
                     isDark ? "text-slate-400" : "text-slate-400"
                 )}>
                     {recipe.tags[0]}
