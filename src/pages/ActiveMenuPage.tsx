@@ -9,7 +9,7 @@ import { AnimatePresence } from 'framer-motion';
 import { MenuSkeleton } from '../components/MenuSkeleton';
 import { WeeklyGrid } from '../components/WeeklyGrid';
 
-import clsx from 'clsx';
+
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const MEALS = ['Desayuno', 'Media Mañana', 'Comida', 'Cena'];
@@ -140,7 +140,7 @@ export const ActiveMenuPage = () => {
             </header>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-auto p-4 md:p-6 2xl:p-10 bg-slate-50/50">
+            <div className="flex-1 overflow-y-auto overflow-x-auto p-4 md:p-6 2xl:p-10 bg-slate-50/50">
                 <AnimatePresence mode="wait">
                     {isLoadingMagic ? (
                         <MenuSkeleton key="skeleton" />
@@ -151,42 +151,6 @@ export const ActiveMenuPage = () => {
                         />
                     )}
                 </AnimatePresence>
-            </div>
-        </div>
-    )
-}
-
-export const MenuCard = ({ recipe, isDark }: { recipe: Recipe | null, isDark?: boolean }) => {
-    if (!recipe) return <div className={clsx("h-16 2xl:h-24 rounded-xl border-2 border-dashed opacity-50", isDark ? "border-slate-600 bg-slate-700" : "border-slate-200 bg-slate-50")}></div>;
-
-    return (
-        <div className={clsx(
-            "group flex items-center gap-3 p-2 2xl:p-3 rounded-xl shadow-sm cursor-pointer transition-all duration-300",
-            isDark
-                ? "bg-slate-700/50 hover:bg-slate-700 border border-slate-600"
-                : "bg-white hover:shadow-md border border-slate-100 hover:border-emerald-200"
-        )}>
-            <div className="relative overflow-hidden rounded-lg w-12 h-12 2xl:w-20 2xl:h-20 flex-shrink-0">
-                <img
-                    src={recipe.image}
-                    alt={recipe.name}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                />
-            </div>
-
-            <div className="min-w-0 flex-1">
-                <p className={clsx(
-                    "text-[11px] 2xl:text-base font-bold leading-tight line-clamp-2 mb-0.5",
-                    isDark ? "text-slate-100" : "text-slate-700"
-                )}>
-                    {recipe.name}
-                </p>
-                <p className={clsx(
-                    "text-[9px] 2xl:text-xs truncate font-medium",
-                    isDark ? "text-slate-400" : "text-slate-400"
-                )}>
-                    {recipe.tags[0]}
-                </p>
             </div>
         </div>
     )

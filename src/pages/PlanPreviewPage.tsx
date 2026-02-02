@@ -102,7 +102,7 @@ export const PlanPreviewPage = () => {
                 </div>
 
                 {/* Scrollable Grid Area */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8">
+                <div className="flex-1 overflow-y-auto overflow-x-auto p-4 md:p-8">
                     <div className="max-w-[1600px] mx-auto">
                         <WeeklyGrid
                             dates={dates}

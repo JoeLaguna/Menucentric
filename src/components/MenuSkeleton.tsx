@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 export const MenuSkeleton = () => {
     return (
         <motion.div
-            className="min-w-[1000px] xl:min-w-0 xl:w-full h-full grid grid-cols-7 gap-3 2xl:gap-6"
+            className="min-w-[1400px] h-full grid grid-cols-7 gap-3 2xl:gap-6 pb-20 lg:pb-0"
         >
             {Array.from({ length: 7 }).map((_, i) => (
                 <div key={i} className="bg-slate-100 rounded-2xl p-3 2xl:p-5 flex flex-col gap-4 animate-pulse">

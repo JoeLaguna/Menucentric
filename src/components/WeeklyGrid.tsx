@@ -23,7 +23,7 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot }: WeeklyGridProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="w-full min-w-0 h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3 2xl:gap-6 pb-20 lg:pb-0"
+            className="min-w-[1400px] h-full grid grid-cols-7 gap-3 2xl:gap-6 pb-20 lg:pb-0"
         >
             {dates.map((day, dayIndex) => (
                 <div
