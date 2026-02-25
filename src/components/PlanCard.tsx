@@ -54,16 +54,16 @@ export const PlanCard = ({
             {/* Content Below - Clean Text */}
             <div className="flex flex-col px-1">
                 <div className="flex justify-between items-start gap-2">
-                    <h3 className="font-bold text-slate-900 text-base leading-tight group-hover:text-emerald-600 transition-colors">
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                         {title}
                     </h3>
                     <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-xs font-bold text-slate-900">★ 4.9</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-slate-200">★ 4.9</span>
                     </div>
                 </div>
 
                 {description && (
-                    <p className="text-slate-500 text-sm leading-snug line-clamp-1 mt-0.5">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-snug line-clamp-1 mt-0.5">
                         {description}
                     </p>
                 )}

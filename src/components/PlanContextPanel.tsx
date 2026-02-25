@@ -6,6 +6,7 @@ interface PlanContextPanelProps {
     image: string;
     onBack?: () => void;
     onPersonalize?: () => void;
+    onPersonalizeSidebar?: () => void; // A/B Test option
     className?: string;
 }
 
@@ -14,6 +15,7 @@ export const PlanContextPanel = ({
     image,
     onBack,
     onPersonalize,
+    onPersonalizeSidebar,
     className
 }: PlanContextPanelProps) => {
     return (
@@ -91,19 +93,33 @@ export const PlanContextPanel = ({
                     </motion.div>
                 </div>
 
-                {/* Primary Action */}
-                <motion.button
-                    onClick={onPersonalize}
+                {/* A/B Test Actions */}
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-white/10 hover:shadow-white/20 transition-all"
+                    className="flex flex-col gap-3"
                 >
-                    <Wand2 size={20} className="text-purple-600" />
-                    Personalizar Menú
-                </motion.button>
+                    <p className="text-xs text-white/60 font-medium uppercase tracking-widest text-center mb-1">Elige cómo personalizar (A/B Test)</p>
+
+                    {/* Option A: Full Page */}
+                    <button
+                        onClick={onPersonalize}
+                        className="w-full bg-white text-slate-900 py-3.5 rounded-2xl font-black text-base flex items-center justify-center gap-3 shadow-xl shadow-white/10 hover:shadow-white/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        <Wand2 size={18} className="text-purple-600" />
+                        Pantalla Completa (Full)
+                    </button>
+
+                    {/* Option B: Sidebar */}
+                    <button
+                        onClick={onPersonalizeSidebar}
+                        className="w-full bg-white/10 backdrop-blur-md border border-white/20 text-white py-3.5 rounded-2xl font-black text-base flex items-center justify-center gap-3 hover:bg-white/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        <Wand2 size={18} className="text-emerald-400" />
+                        Panel Lateral (Sidebar)
+                    </button>
+                </motion.div>
             </div>
         </div>
     );

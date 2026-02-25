@@ -1,12 +1,14 @@
 
-
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import clsx from 'clsx';
 import { RECIPES } from '../data/recipes';
 import { WeeklyGrid } from '../components/WeeklyGrid';
 import { PlanContextPanel } from '../components/PlanContextPanel';
 import { PlanInfoSidebar } from '../components/PlanInfoSidebar';
+import { SidebarMealSelection } from '../components/MealSelection/SidebarMealSelection';
 import type { Recipe } from '../types';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -38,6 +40,13 @@ export const PlanPreviewPage = () => {
     const { planTitle, planImage } = location.state || {};
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+    // A/B Test State
+    const [isMealSelectionOpen, setIsMealSelectionOpen] = useState(false);
+
+    // Resize State
+    const [sidebarWidth, setSidebarWidth] = useState(28); // Reverted to default responsive width
+    const [isResizing, setIsResizing] = useState(false);
+
     const dates = useMemo(() => getPreviewDates(), []);
 
     // Mock generic recipe distribution
@@ -60,8 +69,9 @@ export const PlanPreviewPage = () => {
 
     const handleBack = () => navigate(-1);
 
+    // Flow A: Dedicated Page
     const handlePersonalize = () => {
-        navigate('/tinder-mode', {
+        navigate('/meal-selection', {
             state: {
                 planTitle: planTitle || "Plan Personalizado",
                 planImage: planImage
@@ -69,52 +79,128 @@ export const PlanPreviewPage = () => {
         });
     };
 
+    // Flow B: Sidebar
+    const handlePersonalizeSidebar = () => {
+        setIsMealSelectionOpen(true);
+    };
+
+    const handleGenerateMenu = () => {
+        setIsMealSelectionOpen(false);
+        navigate('/home', { state: { showConfetti: true, planTitle: planTitle || 'Mi Menú Personalizado' } });
+    };
+
+    // Resize Handlers
+    const startResizing = React.useCallback(() => {
+        setIsResizing(true);
+    }, []);
+
+    const stopResizing = React.useCallback(() => {
+        setIsResizing(false);
+    }, []);
+
+    const resize = React.useCallback(
+        (mouseMoveEvent: MouseEvent) => {
+            if (isResizing) {
+                // Calculate width from the RIGHT side
+                const newWidth = ((window.innerWidth - mouseMoveEvent.clientX) / window.innerWidth) * 100;
+                if (newWidth > 20 && newWidth < 60) { // Limits maintained
+                    setSidebarWidth(newWidth);
+                }
+            }
+        },
+        [isResizing]
+    );
+
+    React.useEffect(() => {
+        window.addEventListener("mousemove", resize);
+        window.addEventListener("mouseup", stopResizing);
+        return () => {
+            window.removeEventListener("mousemove", resize);
+            window.removeEventListener("mouseup", stopResizing);
+        };
+    }, [resize, stopResizing]);
+
     return (
-        <div className="h-screen bg-slate-50 flex flex-col lg:flex-row overflow-hidden">
+        <div className="h-full bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row overflow-hidden select-none transition-colors duration-300">
 
-            {/* Left Panel - Context (Sticky/Fixed aesthetic) */}
-            <div className="w-full lg:w-[35%] h-[40vh] lg:h-full flex-shrink-0 relative z-20 shadow-2xl">
-                <PlanContextPanel
-                    title={planTitle || "Plan Semanal"}
-                    image={planImage || "/images/plans/default.jpg"}
-                    onBack={handleBack}
-                    onPersonalize={handlePersonalize}
-                    className="h-full"
-                />
-            </div>
-
-            {/* Right Panel - Grid Content */}
-            <div className="flex-1 h-full relative flex flex-col bg-slate-50 overflow-hidden">
+            {/* Right Panel - Grid Content (Now Left) */}
+            <div className="flex-1 h-full relative flex flex-col bg-slate-50 dark:bg-slate-950 overflow-hidden order-2 lg:order-1 transition-colors">
 
                 {/* Simplified Header for Grid Area */}
-                <div className="flex-shrink-0 px-6 py-4 bg-white/80 backdrop-blur-sm border-b border-slate-200 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex-shrink-0 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10 transition-colors">
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
-                            <button className="p-1 hover:bg-white rounded-md shadow-sm transition-all text-slate-500"><ChevronLeft size={18} /></button>
-                            <span className="text-sm font-bold text-slate-700 px-3">Semana 31</span>
-                            <button className="p-1 hover:bg-white rounded-md shadow-sm transition-all text-slate-500"><ChevronRight size={18} /></button>
+                        <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 transition-colors">
+                            <button className="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md shadow-sm transition-all text-slate-500 dark:text-slate-400"><ChevronLeft size={18} /></button>
+                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200 px-3">Semana 31</span>
+                            <button className="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md shadow-sm transition-all text-slate-500 dark:text-slate-400"><ChevronRight size={18} /></button>
                         </div>
                     </div>
 
-                    <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all">
+                    <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">
                         <Share2 size={20} />
                     </button>
                 </div>
 
                 {/* Scrollable Grid Area */}
-                <div className="flex-1 overflow-y-auto overflow-x-auto p-4 md:p-8">
-                    <div className="max-w-[1600px] mx-auto">
+                <div className="flex-1 overflow-y-auto overflow-x-auto px-4 py-2 md:px-6 md:py-4 2xl:p-10 custom-scrollbar">
+                    <div className="w-full min-w-0 mx-auto h-full">
                         <WeeklyGrid
                             dates={dates}
                             getRecipeForSlot={getRecipeForSlot}
                         />
                     </div>
-                    {/* Bottom Spacer for mobile fab clearance if needed */}
-                    <div className="h-24 lg:h-8" />
+                    {/* Bottom Spacer for mobile fab clearance */}
+                    <div className="h-24 lg:hidden shrink-0" />
                 </div>
             </div>
 
-            {/* Sidebar (Optional info) */}
+            {/* Drag Handle (Desktop Only) */}
+            <div
+                className="hidden lg:flex w-4 bg-slate-100/50 dark:bg-slate-800/50 hover:bg-emerald-500/20 dark:hover:bg-emerald-500/10 cursor-col-resize items-center justify-center transition-colors z-30 -mr-2 order-1 lg:order-2"
+                onMouseDown={startResizing}
+                style={{ cursor: 'col-resize' }}
+            >
+                <div className={clsx(
+                    "w-1 h-8 rounded-full transition-colors",
+                    isResizing ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+                )} />
+            </div>
+
+            {/* Context Panel (Now Right) */}
+            <div
+                className="w-full lg:h-full flex-shrink-0 relative z-20 shadow-[-10px_0_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-75 ease-out order-1 lg:order-3 bg-white dark:bg-slate-950 overflow-hidden"
+                style={{ width: window.innerWidth >= 1024 ? `${sidebarWidth}%` : '100%', height: window.innerWidth < 1024 ? '40vh' : '100%' }}
+            >
+                <AnimatePresence mode="wait">
+                    {isMealSelectionOpen ? (
+                        <SidebarMealSelection
+                            key="meal-selection"
+                            planTitle={planTitle || "Plan Semanal"}
+                            onGenerate={handleGenerateMenu}
+                            onClose={() => setIsMealSelectionOpen(false)}
+                        />
+                    ) : (
+                        <motion.div
+                            key="context-panel"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="h-full"
+                        >
+                            <PlanContextPanel
+                                title={planTitle || "Plan Semanal"}
+                                image={planImage || "/images/plans/default.jpg"}
+                                onBack={handleBack}
+                                onPersonalize={handlePersonalize}
+                                onPersonalizeSidebar={handlePersonalizeSidebar}
+                                className="h-full"
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Optional Sidebar (Legacy) */}
             <PlanInfoSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}

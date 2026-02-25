@@ -14,6 +14,10 @@ import { ShoppingListPage } from './pages/ShoppingListPage';
 import { MealListsPage } from './pages/MealListsPage';
 import { PageTransition } from './components/PageTransition';
 import { PlanPreviewPage } from './pages/PlanPreviewPage';
+import { AccountPage } from './pages/AccountPage';
+import { MealSelectionPage } from './pages/MealSelectionPage';
+import { ShoppingConceptPage } from './pages/ShoppingConceptPage';
+import { RecipeModal } from './components/RecipeModal';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -25,6 +29,12 @@ function AnimatedRoutes() {
         <Route path="/" element={
           <PageTransition>
             <LandingPage />
+          </PageTransition>
+        } />
+
+        <Route path="/shopping-concepts" element={
+          <PageTransition>
+            <ShoppingConceptPage />
           </PageTransition>
         } />
 
@@ -45,6 +55,16 @@ function AnimatedRoutes() {
           <Route path="/plan-preview" element={
             <PageTransition>
               <PlanPreviewPage />
+            </PageTransition>
+          } />
+          <Route path="/account" element={
+            <PageTransition>
+              <AccountPage />
+            </PageTransition>
+          } />
+          <Route path="/meal-selection" element={
+            <PageTransition>
+              <MealSelectionPage />
             </PageTransition>
           } />
           <Route path="/tinder-mode" element={
@@ -71,9 +91,15 @@ function AnimatedRoutes() {
   );
 }
 
+import { Navbar } from './components/Navbar';
+
 function App() {
   return (
-    <AnimatedRoutes />
+    <>
+      <Navbar />
+      <AnimatedRoutes />
+      <RecipeModal />
+    </>
   )
 }
 

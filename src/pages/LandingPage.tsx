@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, SlidersHorizontal, MapPin } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 import { PlanCard } from '../components/PlanCard';
 
 // Helper to get image path
@@ -89,56 +89,38 @@ export const LandingPage = () => {
     }, [activeCategory]);
 
     return (
-        <div className="min-h-screen bg-white pb-24 font-sans">
-            {/* --- Header (Airbnb style) --- */}
-            <header className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
-                    {/* Brand */}
-                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-                        <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">M</div>
-                        <span className="text-emerald-600 font-extrabold text-xl tracking-tight hidden md:block">MenuCentric</span>
-                    </div>
+        <div className="mt-16 h-[calc(100vh-4rem)] overflow-y-auto bg-white dark:bg-slate-950 pb-24 font-sans transition-colors duration-300">
+            {/* --- Header / Filters --- */}
+            <div className="sticky top-16 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800 shadow-sm pt-6 pb-2 transition-colors">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col gap-6">
 
-                    {/* Search Pill */}
-                    <div className="hidden md:flex flex-1 max-w-lg mx-auto bg-white border border-slate-200 rounded-full shadow-sm hover:shadow-md transition-shadow items-center p-1.5 pl-6 cursor-pointer">
-                        <div className="flex-1 flex items-center gap-2 divide-x divide-slate-200">
-                            <span className="text-sm font-semibold text-slate-900 line-clamp-1">Cualquier plan</span>
-                            <span className="text-sm font-semibold text-slate-900 px-4 line-clamp-1">Cualquier semana</span>
-                            <span className="text-sm text-slate-500 px-4 font-normal line-clamp-1">¿Cuántos sois?</span>
+                    {/* Search Pill (Centered) */}
+                    <div className="hidden md:flex w-full max-w-2xl mx-auto bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full shadow-sm hover:shadow-md transition-all items-center p-2 pl-8 cursor-pointer group">
+                        <div className="flex-1 flex items-center gap-4 divide-x divide-slate-200 dark:divide-slate-700">
+                            <span className="text-base font-semibold text-slate-900 dark:text-slate-100 line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Cualquier plan</span>
+                            <span className="text-base font-semibold text-slate-900 dark:text-slate-100 px-6 line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Cualquier semana</span>
+                            <span className="text-base text-slate-500 dark:text-slate-400 px-6 font-normal line-clamp-1">¿Cuántos sois?</span>
                         </div>
-                        <div className="bg-emerald-500 rounded-full p-2.5 text-white">
-                            <Search size={16} strokeWidth={3} />
+                        <div className="bg-emerald-500 rounded-full p-3 text-white shadow-md group-hover:scale-105 transition-transform">
+                            <Search size={22} strokeWidth={2.5} />
                         </div>
                     </div>
 
                     {/* Mobile Search Placeholder */}
-                    <div className="md:hidden flex-1 flex items-center gap-3 bg-slate-100 rounded-full px-4 py-3">
-                        <Search size={18} className="text-slate-500" />
-                        <span className="text-slate-500 font-medium text-sm">Buscar planes...</span>
+                    <div className="md:hidden flex items-center gap-4 bg-slate-100 rounded-full px-6 py-4">
+                        <Search size={20} className="text-slate-500" />
+                        <span className="text-slate-500 font-medium text-base">Buscar planes...</span>
                     </div>
 
-                    {/* User Actions */}
-                    <div className="flex items-center gap-2">
-                        <button className="hidden md:block text-sm font-bold text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-full transition-colors">
-                            Hazte Premium
-                        </button>
-                        <div className="flex items-center gap-2 border border-slate-200 rounded-full p-1 pl-3 hover:shadow-md transition-shadow cursor-pointer">
-                            <SlidersHorizontal size={16} className="text-slate-600" />
-                            <div className="w-8 h-8 bg-slate-500 rounded-full text-white flex items-center justify-center text-xs">J</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* --- Category Filter Bar --- */}
-                <div className="max-w-7xl mx-auto px-6 pt-4 pb-0">
-                    <div className="flex items-center gap-8 overflow-x-auto scrollbar-hide pb-4">
+                    {/* --- Category Filter Bar --- */}
+                    <div className="flex items-center gap-10 overflow-x-auto scrollbar-hide pb-4 pt-2 px-2 md:justify-center">
                         {/* 'All' Tab */}
                         <button
                             onClick={() => setActiveCategory('all')}
-                            className={`flex flex-col items-center gap-2 min-w-[64px] cursor-pointer group ${activeCategory === 'all' ? 'text-black' : 'text-slate-500 hover:text-slate-800'}`}
+                            className={`flex flex-col items-center gap-3 min-w-[72px] cursor-pointer group transition-all ${activeCategory === 'all' ? 'text-black scale-105' : 'text-slate-500 hover:text-slate-800 hover:scale-105'}`}
                         >
-                            <span className={`text-2xl transition-transform ${activeCategory === 'all' ? 'scale-110' : 'group-hover:scale-110'}`}>🌍</span>
-                            <span className={`text-xs font-bold whitespace-nowrap pb-2 border-b-2 transition-colors ${activeCategory === 'all' ? 'border-black' : 'border-transparent group-hover:border-slate-300'}`}>
+                            <span className="text-4xl filter drop-shadow-sm">🌍</span>
+                            <span className={`text-sm font-bold whitespace-nowrap pb-3 border-b-2 transition-all ${activeCategory === 'all' ? 'border-black dark:border-white text-black dark:text-white' : 'border-transparent group-hover:border-slate-300 dark:group-hover:border-slate-600'}`}>
                                 Todos
                             </span>
                         </button>
@@ -147,19 +129,19 @@ export const LandingPage = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id)}
-                                className={`flex flex-col items-center gap-2 min-w-[64px] cursor-pointer group ${activeCategory === cat.id ? 'text-black' : 'text-slate-500 hover:text-slate-800'}`}
+                                className={`flex flex-col items-center gap-3 min-w-[72px] cursor-pointer group transition-all ${activeCategory === cat.id ? 'text-black dark:text-white scale-105' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:scale-105'}`}
                             >
-                                <span className={`text-2xl transition-transform ${activeCategory === cat.id ? 'scale-110' : 'group-hover:scale-110'}`}>
+                                <span className="text-4xl filter drop-shadow-sm">
                                     {cat.icon}
                                 </span>
-                                <span className={`text-xs font-bold whitespace-nowrap pb-2 border-b-2 transition-colors ${activeCategory === cat.id ? 'border-black' : 'border-transparent group-hover:border-slate-300'}`}>
+                                <span className={`text-sm font-bold whitespace-nowrap pb-3 border-b-2 transition-all ${activeCategory === cat.id ? 'border-black dark:border-white' : 'border-transparent group-hover:border-slate-300 dark:group-hover:border-slate-600'}`}>
                                     {cat.title}
                                 </span>
                             </button>
                         ))}
                     </div>
                 </div>
-            </header>
+            </div>
 
             {/* --- Mobile Floating Map Toggle Mock --- */}
             <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 md:hidden">
@@ -172,7 +154,7 @@ export const LandingPage = () => {
             <main className="max-w-[1920px] mx-auto px-6 py-8">
                 {/* Section Title (Optional, helpful context) */}
                 <div className="mb-6 flex items-center justify-between">
-                    <p className="text-slate-900 font-bold text-lg">
+                    <p className="text-slate-900 dark:text-white font-bold text-lg">
                         {activeCategory === 'all' ? 'Explora todos los planes' : `Planes de ${CATEGORIES.find(c => c.id === activeCategory)?.title}`}
                     </p>
                 </div>
@@ -199,6 +181,6 @@ export const LandingPage = () => {
                     </div>
                 )}
             </main>
-        </div>
+        </div >
     );
 };

@@ -21,17 +21,26 @@ export interface MealList {
     coverImage?: string;
 }
 
+export type BackgroundPreference = { type: 'color' | 'image'; value: string };
+
 interface MenuState {
     preferences: WeeklyPreference[];
     activeMenu: WeeklyPreference[];
+    nextWeekMenu: WeeklyPreference[] | null;
     shoppingList: Ingredient[];
     filters: FilterState;
+
+    // View State
+    background: BackgroundPreference | null;
+    setBackground: (bg: BackgroundPreference | null) => void;
 
     // MealLists State
     mealLists: MealList[];
 
     // Actions
     addPreference: (recipeId: string, wants: boolean) => void;
+    setPreferences: (preferences: WeeklyPreference[]) => void;
+    setNextWeekMenu: (preferences: WeeklyPreference[] | null) => void;
     resetPreferences: () => void;
     activateMenu: () => void;
     addIngredient: (name: string, category: string) => void;
@@ -44,6 +53,10 @@ interface MenuState {
     deleteMealList: (id: string) => void;
     addRecipeToList: (listId: string, recipeId: string) => void;
     removeRecipeFromList: (listId: string, recipeId: string) => void;
+
+    // Modal State
+    selectedRecipe: import('../types').Recipe | null;
+    setSelectedRecipe: (recipe: import('../types').Recipe | null) => void;
 }
 
 // Helper to get initial lists (simulated persistence/default)
@@ -96,12 +109,21 @@ export const useMenuStore = create<MenuState>()(
         (set, get) => ({
             preferences: [],
             activeMenu: [],
+            nextWeekMenu: null,
             shoppingList: [],
             filters: {
                 maxTime: 60,
                 difficulty: 'all'
             },
+
+            // Initial Values
             mealLists: INITIAL_LISTS,
+            selectedRecipe: null,
+            background: null,
+
+            setBackground: (bg) => set({ background: bg }),
+
+            setSelectedRecipe: (recipe) => set({ selectedRecipe: recipe }),
 
             addPreference: (recipeId, wants) => set((state) => {
                 // Side Effect: If user likes a recipe (wants=true), add it to "Favorites" automatically for MVP convenience?
@@ -114,6 +136,9 @@ export const useMenuStore = create<MenuState>()(
                     ]
                 };
             }),
+
+            setPreferences: (preferences) => set({ preferences }),
+            setNextWeekMenu: (preferences) => set({ nextWeekMenu: preferences }),
 
             // --- MealList Actions Implementation ---
             createMealList: (name, description) => set((state) => ({
