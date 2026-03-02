@@ -240,12 +240,11 @@ export const ActiveMenuPage = () => {
                 </div>
             </header>
 
-            {/* Content Area */}
             <div className={clsx(
-                "relative z-10 flex-1 overflow-y-auto overflow-x-auto px-4 py-2 md:px-6 md:py-4 2xl:p-10 transition-colors custom-scrollbar",
+                "relative z-10 flex-1 overflow-y-auto overflow-x-auto px-4 md:px-6 py-2 2xl:px-10 2xl:py-4 transition-colors custom-scrollbar",
                 !background && "bg-slate-50/50 dark:bg-slate-950"
             )}>
-                <div className="w-full min-w-0 mx-auto h-full">
+                <div className="w-full min-w-0 mx-auto">
                     <AnimatePresence mode="wait">
                         {isLoadingMagic ? (
                             <MenuSkeleton key="skeleton" />

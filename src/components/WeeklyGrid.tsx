@@ -29,37 +29,46 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot, hasBackground, isGhostMode
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="w-full h-full flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-7 gap-4 md:gap-3 2xl:gap-6 pb-20 lg:pb-0"
+            className="w-full h-full flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-7 gap-4 md:gap-3 2xl:gap-3 2xl:pb-0 pb-20 lg:pb-0"
         >
             {dates.map((day, dayIndex) => (
                 <div
                     key={day.name}
                     className={clsx(
-                        "rounded-2xl p-4 md:p-3 2xl:p-4 flex flex-col gap-2 2xl:gap-4 border transition-all h-full flex-shrink-0 snap-center min-w-[85vw] md:min-w-[45vw] lg:min-w-0",
+                        "rounded-xl flex flex-col transition-all h-full min-h-0 flex-shrink-0 snap-center min-w-[85vw] md:min-w-[45vw] lg:min-w-0",
+                        // Fluid padding and gaps
+                        "p-3 gap-2", // Default (Mobile)
+                        "lg:p-2 lg:gap-2", // 1080p
+                        "xl:p-3 xl:gap-3", // 1440p
+                        "2xl:p-4 2xl:gap-4", // 4K+
                         hasBackground ? "backdrop-blur-sm" : "",
                         day.isToday
                             ? clsx(
-                                hasBackground ? "bg-slate-800/80 dark:bg-emerald-900/30" : "bg-slate-800 dark:bg-emerald-900/10",
-                                "border-slate-700 dark:border-emerald-500/20 shadow-xl shadow-slate-300 dark:shadow-none ring-1 ring-slate-200/50 dark:ring-emerald-500/20 z-10"
+                                hasBackground ? "bg-slate-800/90 dark:bg-slate-800/90" : "bg-[#2A344A] dark:bg-[#2A344A]", // Darker blue-slate for today
+                                "shadow-xl z-10"
                             )
                             : clsx(
-                                hasBackground ? "bg-white/70 dark:bg-slate-900/70" : "bg-white dark:bg-slate-900",
-                                "border-slate-100 dark:border-slate-800"
+                                hasBackground ? "bg-white/80 dark:bg-slate-800/80" : "bg-[#DEE4F0] dark:bg-[#344054]", // Light slate-blue for other days
+                                "border-transparent"
                             )
                     )}
                 >
                     {/* Column Header */}
-                    <div className="mb-1 2xl:mb-2 text-center border-b border-dashed border-slate-200/20 pb-1">
+                    <div className="flex-shrink-0 mb-1 lg:mb-1 xl:mb-2 2xl:mb-4 text-center border-b border-solid border-slate-300/50 dark:border-slate-700 pb-1 lg:pb-1 xl:pb-2 2xl:pb-3 mt-1">
                         <p className={clsx(
-                            "text-[10px] md:text-xs 2xl:text-base font-bold uppercase tracking-wider",
-                            day.isToday ? "text-emerald-400" : "text-slate-500 dark:text-slate-400"
+                            "font-bold uppercase tracking-wider",
+                            "text-[10px] md:text-xs", // Mobile
+                            "lg:text-[9px]", // 1080p
+                            "xl:text-xs", // 1440p
+                            "2xl:text-sm", // 4K+
+                            day.isToday ? "text-emerald-400" : "text-slate-600 dark:text-slate-400"
                         )}>
                             {day.name}, {day.date} de {day.month}
                         </p>
                     </div>
 
                     {/* Meal Slots */}
-                    <div className="flex-1 flex flex-col gap-2 2xl:gap-4">
+                    <div className="flex-1 flex flex-col lg:pr-1 gap-3 lg:gap-2 xl:gap-3 2xl:gap-6">
                         {MEALS.map((mealType, mealIndex) => {
                             const recipe = getRecipeForSlot(dayIndex, mealIndex);
 
@@ -80,10 +89,14 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot, hasBackground, isGhostMode
                             }
 
                             return (
-                                <div key={mealType} className="flex flex-col gap-1 2xl:gap-2">
+                                <div key={mealType} className="flex flex-col gap-1 lg:gap-1 xl:gap-1.5 2xl:gap-3">
                                     <span className={clsx(
-                                        "text-[9px] 2xl:text-xs font-black uppercase tracking-widest opacity-60",
-                                        day.isToday ? "text-slate-400" : "text-slate-400 dark:text-slate-500"
+                                        "font-black uppercase tracking-wide",
+                                        "text-[10px]", // Mobile
+                                        "lg:text-[8px]", // 1080p
+                                        "xl:text-[9px]", // 1440p
+                                        "2xl:text-sm", // 4K+
+                                        day.isToday ? "text-emerald-900/40 dark:text-emerald-100/40" : "text-slate-500/80 dark:text-slate-400"
                                     )}>
                                         {mealType === 'Media Mañana' ? 'Snack' : mealType}
                                     </span>
