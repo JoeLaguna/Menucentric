@@ -28,13 +28,13 @@ export const MenuCard = ({ recipe, customItem, isDark, onClick }: MenuCardProps)
             onClick={onClick}
             className={clsx(
                 "group flex items-center rounded-2xl shadow-sm cursor-pointer transition-all duration-300 w-full",
-                // Fluid padding and gaps
-                "gap-2 p-2", // Default (Mobile)
-                "lg:gap-2 lg:p-1.5", // 1080p (Tightest)
-                "xl:gap-2 xl:p-2.5", // 1440p
-                "2xl:gap-3 2xl:p-3", // 4K+
-                // Fluid minimum heights - reduced
-                "min-h-[64px] md:min-h-[80px] lg:min-h-[64px] xl:min-h-[80px] 2xl:min-h-[110px]",
+                // Fluid padding and gaps - extremely compact
+                "gap-1.5 p-1.5", // Default (Mobile)
+                "lg:gap-1.5 lg:p-1", // 1080p (Tightest)
+                "xl:gap-2 xl:p-1.5", // 1440p
+                "2xl:gap-2.5 2xl:p-2.5", // 4K+
+                // Fluid minimum heights - drastically reduced to let flex take control
+                "min-h-[48px] md:min-h-[56px] lg:min-h-[48px] xl:min-h-[56px] 2xl:min-h-[80px]",
                 isDark
                     ? "bg-slate-700/50 hover:bg-slate-700 border border-slate-600"
                     : "bg-white dark:bg-slate-800 hover:shadow-md border-[1.5px] border-transparent hover:border-emerald-200 dark:hover:border-emerald-500/30",
@@ -42,8 +42,8 @@ export const MenuCard = ({ recipe, customItem, isDark, onClick }: MenuCardProps)
             )}>
             <div className={clsx(
                 "relative overflow-hidden rounded-[10px] flex-shrink-0 flex items-center justify-center",
-                // Proportional image sizing wrapper
-                "w-[40%] max-w-[56px] 2xl:max-w-[76px] min-w-[32px] aspect-square",
+                // Proportional image sizing wrapper - smaller and more elegant
+                "w-[35%] max-w-[48px] xl:max-w-[56px] 2xl:max-w-[64px] min-w-[32px] aspect-square",
                 !imageSrc && "bg-slate-100 dark:bg-slate-700"
             )}>
                 {imageSrc ? (
@@ -62,10 +62,8 @@ export const MenuCard = ({ recipe, customItem, isDark, onClick }: MenuCardProps)
                 <p className={clsx(
                     "font-bold break-words",
                     "line-clamp-3 2xl:line-clamp-4", // Prevent vertical blowout
-                    // Responsive text
-                    // text-[clamp(10px,1.2vw,16px)] uses viewport width which might not map well to sidebar open/close, 
-                    // combining basic responsive breakpoints with tight line height.
-                    "text-[10px] leading-[1.15] xl:text-[11px] xl:leading-tight 2xl:text-sm",
+                    // Responsive text - tighter
+                    "text-[9px] leading-[1.15] xl:text-[10px] xl:leading-tight 2xl:text-sm",
                     isDark ? "text-slate-100" : "text-black dark:text-slate-100"
                 )}>
                     {title}
