@@ -156,10 +156,10 @@ export const ActiveMenuPage = () => {
             </div>
 
             {/* Header */}
-            <header className="relative z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-sm border-b border-slate-100/50 dark:border-slate-800/50 flex-shrink-0 transition-colors">
+            <header className="relative z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 py-2 md:px-6 md:py-4 flex items-center justify-between shadow-sm border-b border-slate-100/50 dark:border-slate-800/50 flex-shrink-0 transition-colors">
                 <div>
-                    <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight 2xl:text-3xl transition-all">{location.state?.planTitle || "Plan Personalizado"}</h1>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 2xl:text-sm">by Jamie Oliver</p>
+                    <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight 2xl:text-3xl transition-all">{location.state?.planTitle || "Plan Personalizado"}</h1>
+                    <p className="hidden md:block text-xs text-slate-400 dark:text-slate-500 2xl:text-sm">by Jamie Oliver</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -241,7 +241,7 @@ export const ActiveMenuPage = () => {
             </header>
 
             <div className={clsx(
-                "relative z-10 flex-1 overflow-y-auto overflow-x-auto px-4 md:px-6 py-2 2xl:px-10 2xl:py-4 transition-colors custom-scrollbar",
+                "relative z-10 flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 py-2 2xl:px-10 2xl:py-4 transition-colors custom-scrollbar",
                 !background && "bg-slate-50/50 dark:bg-slate-950"
             )}>
                 <div className="w-full min-w-0 mx-auto">

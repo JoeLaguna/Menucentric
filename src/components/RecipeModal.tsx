@@ -18,8 +18,16 @@ export const RecipeModal = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSelectedRecipe(null)}
-                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:p-8"
+                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 md:p-8 pt-16 md:pt-8"
                     >
+                        {/* Mobile Global Close Button */}
+                        <button
+                            onClick={() => setSelectedRecipe(null)}
+                            className="absolute top-4 right-4 md:hidden z-[60] p-2 bg-slate-800/50 hover:bg-slate-800/80 text-white rounded-full backdrop-blur-md border border-white/10 shadow-lg"
+                        >
+                            <X size={24} />
+                        </button>
+
                         {/* Modal Container */}
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -28,10 +36,10 @@ export const RecipeModal = () => {
                             onClick={(e) => e.stopPropagation()}
                             className="bg-white rounded-[2rem] shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row relative"
                         >
-                            {/* Close Button */}
+                            {/* Desktop Close Button */}
                             <button
                                 onClick={() => setSelectedRecipe(null)}
-                                className="absolute top-4 right-4 z-20 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-all"
+                                className="hidden md:block absolute top-4 right-4 z-20 p-2 bg-black/5 hover:bg-black/10 text-slate-400 hover:text-slate-600 rounded-full transition-all"
                             >
                                 <X size={24} />
                             </button>

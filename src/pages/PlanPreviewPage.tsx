@@ -69,19 +69,20 @@ export const PlanPreviewPage = () => {
 
     const handleBack = () => navigate(-1);
 
-    // Flow A: Dedicated Page
+    // Dynamic Generation Action based on Viewport
     const handlePersonalize = () => {
-        navigate('/meal-selection', {
-            state: {
-                planTitle: planTitle || "Plan Personalizado",
-                planImage: planImage
-            }
-        });
-    };
-
-    // Flow B: Sidebar
-    const handlePersonalizeSidebar = () => {
-        setIsMealSelectionOpen(true);
+        if (window.innerWidth < 1024) {
+            // Mobile: Full page flow for better UX
+            navigate('/meal-selection', {
+                state: {
+                    planTitle: planTitle || "Plan Personalizado",
+                    planImage: planImage
+                }
+            });
+        } else {
+            // Desktop: Sidebar flow for split-screen context
+            setIsMealSelectionOpen(true);
+        }
     };
 
     const handleGenerateMenu = () => {
@@ -121,55 +122,16 @@ export const PlanPreviewPage = () => {
     }, [resize, stopResizing]);
 
     return (
-        <div className="h-full bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row overflow-hidden select-none transition-colors duration-300">
+        <div className="h-full bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden select-none transition-colors duration-300">
 
-            {/* Right Panel - Grid Content (Now Left) */}
-            <div className="flex-1 h-full relative flex flex-col bg-slate-50 dark:bg-slate-950 overflow-hidden order-2 lg:order-1 transition-colors">
-
-                {/* Simplified Header for Grid Area */}
-                <div className="flex-shrink-0 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10 transition-colors">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 transition-colors">
-                            <button className="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md shadow-sm transition-all text-slate-500 dark:text-slate-400"><ChevronLeft size={18} /></button>
-                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200 px-3">Semana 31</span>
-                            <button className="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md shadow-sm transition-all text-slate-500 dark:text-slate-400"><ChevronRight size={18} /></button>
-                        </div>
-                    </div>
-
-                    <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">
-                        <Share2 size={20} />
-                    </button>
-                </div>
-
-                {/* Scrollable Grid Area */}
-                <div className="flex-1 overflow-y-auto overflow-x-auto px-4 py-2 md:px-6 md:py-4 2xl:p-10 custom-scrollbar">
-                    <div className="w-full min-w-0 mx-auto h-full">
-                        <WeeklyGrid
-                            dates={dates}
-                            getRecipeForSlot={getRecipeForSlot}
-                        />
-                    </div>
-                    {/* Bottom Spacer for mobile fab clearance */}
-                    <div className="h-24 lg:hidden shrink-0" />
-                </div>
-            </div>
-
-            {/* Drag Handle (Desktop Only) */}
+            {/* Context Panel (Top on Mobile, Right on Desktop) */}
             <div
-                className="hidden lg:flex w-4 bg-slate-100/50 dark:bg-slate-800/50 hover:bg-emerald-500/20 dark:hover:bg-emerald-500/10 cursor-col-resize items-center justify-center transition-colors z-30 -mr-2 order-1 lg:order-2"
-                onMouseDown={startResizing}
-                style={{ cursor: 'col-resize' }}
-            >
-                <div className={clsx(
-                    "w-1 h-8 rounded-full transition-colors",
-                    isResizing ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
-                )} />
-            </div>
-
-            {/* Context Panel (Now Right) */}
-            <div
-                className="w-full lg:h-full flex-shrink-0 relative z-20 shadow-[-10px_0_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-75 ease-out order-1 lg:order-3 bg-white dark:bg-slate-950 overflow-hidden"
-                style={{ width: window.innerWidth >= 1024 ? `${sidebarWidth}%` : '100%', height: window.innerWidth < 1024 ? '40vh' : '100%' }}
+                className="w-full shrink-0 relative z-20 transition-all duration-75 ease-out order-1 lg:order-3 bg-white dark:bg-slate-950 overflow-hidden lg:shadow-[-10px_0_30px_-5px_rgba(0,0,0,0.1)]"
+                style={{
+                    width: window.innerWidth >= 1024 ? `${sidebarWidth}%` : '100%',
+                    height: window.innerWidth >= 1024 ? '100%' : 'auto', // Auto height on mobile for natural flow
+                    minHeight: window.innerWidth < 1024 ? '35vh' : 'auto' // Minimum height on mobile
+                }}
             >
                 <AnimatePresence mode="wait">
                     {isMealSelectionOpen ? (
@@ -192,12 +154,56 @@ export const PlanPreviewPage = () => {
                                 image={planImage || "/images/plans/default.jpg"}
                                 onBack={handleBack}
                                 onPersonalize={handlePersonalize}
-                                onPersonalizeSidebar={handlePersonalizeSidebar}
                                 className="h-full"
                             />
                         </motion.div>
                     )}
                 </AnimatePresence>
+            </div>
+
+            {/* Drag Handle (Desktop Only) */}
+            <div
+                className="hidden lg:flex w-4 bg-slate-100/50 dark:bg-slate-800/50 hover:bg-emerald-500/20 dark:hover:bg-emerald-500/10 cursor-col-resize items-center justify-center transition-colors z-30 -mr-2 order-2 lg:order-2"
+                onMouseDown={startResizing}
+                style={{ cursor: 'col-resize' }}
+            >
+                <div className={clsx(
+                    "w-1 h-8 rounded-full transition-colors",
+                    isResizing ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+                )} />
+            </div>
+
+            {/* Grid Content (Bottom on Mobile, Left on Desktop) */}
+            <div className="flex-1 relative flex flex-col bg-slate-50 dark:bg-slate-950 order-3 lg:order-1 transition-colors min-h-[60vh] lg:min-h-0 lg:overflow-hidden">
+
+                {/* Fixed Action Navbar for Mobile (Sticky Bottom) -> Will replace contextual button later if needed, for now just the grid */}
+
+                {/* Simplified Header for Grid Area */}
+                <div className="flex-shrink-0 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10 transition-colors">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 transition-colors">
+                            <button className="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md shadow-sm transition-all text-slate-500 dark:text-slate-400"><ChevronLeft size={18} /></button>
+                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200 px-3">Semana 31</span>
+                            <button className="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md shadow-sm transition-all text-slate-500 dark:text-slate-400"><ChevronRight size={18} /></button>
+                        </div>
+                    </div>
+
+                    <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">
+                        <Share2 size={20} />
+                    </button>
+                </div>
+
+                {/* Grid Container */}
+                <div className="flex-1 px-4 py-2 md:px-6 md:py-4 2xl:p-10 lg:overflow-y-auto lg:overflow-x-auto custom-scrollbar">
+                    <div className="w-full min-w-0 mx-auto h-full">
+                        <WeeklyGrid
+                            dates={dates}
+                            getRecipeForSlot={getRecipeForSlot}
+                        />
+                    </div>
+                    {/* Safe area for mobile fab */}
+                    <div className="h-24 shrink-0 lg:hidden" />
+                </div>
             </div>
 
             {/* Optional Sidebar (Legacy) */}
@@ -207,6 +213,17 @@ export const PlanPreviewPage = () => {
                 onPersonalize={handlePersonalize}
                 planTitle={planTitle}
             />
+
+            {/* Mobile Sticky Action Footer */}
+            <div className="lg:hidden fixed bottom-[72px] left-0 right-0 p-4 bg-gradient-to-t from-slate-50 via-slate-50/90 to-transparent dark:from-slate-950 dark:via-slate-950/90 z-40 pointer-events-none">
+                <button
+                    onClick={handlePersonalize}
+                    className="w-full bg-slate-900 border border-slate-700 dark:bg-white text-white dark:text-slate-900 py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all pointer-events-auto"
+                >
+                    <span className="text-emerald-400 dark:text-emerald-600">✨</span>
+                    Generar Plan
+                </button>
+            </div>
         </div>
     );
 };

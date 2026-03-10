@@ -89,10 +89,10 @@ export const LandingPage = () => {
     }, [activeCategory]);
 
     return (
-        <div className="mt-16 h-[calc(100vh-4rem)] overflow-y-auto bg-white dark:bg-slate-950 pb-24 font-sans transition-colors duration-300">
+        <div className="mt-14 md:mt-16 h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] overflow-y-auto bg-white dark:bg-slate-950 pb-20 font-sans transition-colors duration-300">
             {/* --- Header / Filters --- */}
-            <div className="sticky top-16 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800 shadow-sm pt-6 pb-2 transition-colors">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col gap-6">
+            <div className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800 shadow-sm pt-2 md:pt-6 pb-0 md:pb-2 transition-colors">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col gap-3 md:gap-6">
 
                     {/* Search Pill (Centered) */}
                     <div className="hidden md:flex w-full max-w-2xl mx-auto bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full shadow-sm hover:shadow-md transition-all items-center p-2 pl-8 cursor-pointer group">
@@ -107,20 +107,20 @@ export const LandingPage = () => {
                     </div>
 
                     {/* Mobile Search Placeholder */}
-                    <div className="md:hidden flex items-center gap-4 bg-slate-100 rounded-full px-6 py-4">
-                        <Search size={20} className="text-slate-500" />
-                        <span className="text-slate-500 font-medium text-base">Buscar planes...</span>
+                    <div className="md:hidden flex items-center gap-3 bg-slate-100 rounded-full px-5 py-2.5">
+                        <Search size={18} className="text-slate-500" />
+                        <span className="text-slate-500 font-medium text-sm">Buscar planes...</span>
                     </div>
 
                     {/* --- Category Filter Bar --- */}
-                    <div className="flex items-center gap-10 overflow-x-auto scrollbar-hide pb-4 pt-2 px-2 md:justify-center">
+                    <div className="flex items-center gap-6 md:gap-10 overflow-x-auto hide-scrollbar pb-0 pt-1 md:pb-4 md:pt-2 px-1 md:justify-center">
                         {/* 'All' Tab */}
                         <button
                             onClick={() => setActiveCategory('all')}
-                            className={`flex flex-col items-center gap-3 min-w-[72px] cursor-pointer group transition-all ${activeCategory === 'all' ? 'text-black scale-105' : 'text-slate-500 hover:text-slate-800 hover:scale-105'}`}
+                            className={`flex flex-col items-center gap-1.5 md:gap-3 min-w-[64px] md:min-w-[72px] cursor-pointer group transition-all ${activeCategory === 'all' ? 'text-black scale-105' : 'text-slate-500 hover:text-slate-800 hover:scale-105'}`}
                         >
-                            <span className="text-4xl filter drop-shadow-sm">🌍</span>
-                            <span className={`text-sm font-bold whitespace-nowrap pb-3 border-b-2 transition-all ${activeCategory === 'all' ? 'border-black dark:border-white text-black dark:text-white' : 'border-transparent group-hover:border-slate-300 dark:group-hover:border-slate-600'}`}>
+                            <span className="text-3xl md:text-4xl filter drop-shadow-sm">🌍</span>
+                            <span className={`text-[11px] md:text-sm font-bold whitespace-nowrap pb-1.5 md:pb-3 border-b-2 transition-all ${activeCategory === 'all' ? 'border-black dark:border-white text-black dark:text-white' : 'border-transparent group-hover:border-slate-300 dark:group-hover:border-slate-600'}`}>
                                 Todos
                             </span>
                         </button>
@@ -129,12 +129,12 @@ export const LandingPage = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id)}
-                                className={`flex flex-col items-center gap-3 min-w-[72px] cursor-pointer group transition-all ${activeCategory === cat.id ? 'text-black dark:text-white scale-105' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:scale-105'}`}
+                                className={`flex flex-col items-center gap-1.5 md:gap-3 min-w-[64px] md:min-w-[72px] cursor-pointer group transition-all ${activeCategory === cat.id ? 'text-black dark:text-white scale-105' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:scale-105'}`}
                             >
-                                <span className="text-4xl filter drop-shadow-sm">
+                                <span className="text-3xl md:text-4xl filter drop-shadow-sm">
                                     {cat.icon}
                                 </span>
-                                <span className={`text-sm font-bold whitespace-nowrap pb-3 border-b-2 transition-all ${activeCategory === cat.id ? 'border-black dark:border-white' : 'border-transparent group-hover:border-slate-300 dark:group-hover:border-slate-600'}`}>
+                                <span className={`text-[11px] md:text-sm font-bold whitespace-nowrap pb-1.5 md:pb-3 border-b-2 transition-all ${activeCategory === cat.id ? 'border-black dark:border-white' : 'border-transparent group-hover:border-slate-300 dark:group-hover:border-slate-600'}`}>
                                     {cat.title}
                                 </span>
                             </button>
@@ -151,9 +151,9 @@ export const LandingPage = () => {
             </div>
 
             {/* --- Main Grid --- */}
-            <main className="max-w-[1920px] mx-auto px-6 py-8">
+            <main className="max-w-[1920px] mx-auto px-6 py-4 md:py-8">
                 {/* Section Title (Optional, helpful context) */}
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-3 md:mb-6 flex items-center justify-between">
                     <p className="text-slate-900 dark:text-white font-bold text-lg">
                         {activeCategory === 'all' ? 'Explora todos los planes' : `Planes de ${CATEGORIES.find(c => c.id === activeCategory)?.title}`}
                     </p>

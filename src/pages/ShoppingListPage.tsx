@@ -45,27 +45,27 @@ export const ShoppingListPage = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors duration-300">
             {/* Header */}
-            <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-20 px-4 py-3 md:px-6 md:py-4 flex items-center justify-between shadow-sm transition-colors">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-400 transition-colors">
-                        <ArrowLeft size={20} />
+            <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-20 px-3 py-2 md:px-6 md:py-4 flex items-center justify-between shadow-sm transition-colors">
+                <div className="flex items-center gap-2 md:gap-3">
+                    <button onClick={() => navigate(-1)} className="p-1.5 md:p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-slate-400 transition-colors">
+                        <ArrowLeft size={18} className="md:w-5 md:h-5" />
                     </button>
                     <div>
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">Lista de Compra</h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{shoppingList.filter(i => !i.checked).length} pendientes</p>
+                        <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">Lista de Compra</h1>
+                        <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium">{shoppingList.filter(i => !i.checked).length} pendientes</p>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                     <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors hidden md:block">
                         <Printer size={20} />
                     </button>
-                    <button className="text-white bg-slate-900 dark:bg-slate-700 p-2 rounded-full hover:bg-slate-800 dark:hover:bg-slate-600 transition-all shadow-md active:scale-95">
-                        <Share2 size={18} />
+                    <button className="text-white bg-slate-900 dark:bg-slate-700 p-1.5 md:p-2 rounded-full hover:bg-slate-800 dark:hover:bg-slate-600 transition-all shadow-md active:scale-95">
+                        <Share2 size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
                     {/* Concept Test Link */}
                     <button
                         onClick={() => navigate('/shopping-concepts')}
-                        className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full text-xs font-bold hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors shadow-sm border border-indigo-200 dark:border-indigo-800"
+                        className="hidden md:block bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full text-xs font-bold hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors shadow-sm border border-indigo-200 dark:border-indigo-800"
                     >
                         Test Concept
                     </button>

@@ -92,6 +92,7 @@ function AnimatedRoutes() {
 }
 
 import { Navbar } from './components/Navbar';
+import { MobileNavbar } from './components/MobileNavbar';
 
 function App() {
   return (
@@ -99,6 +100,7 @@ function App() {
       <Navbar />
       <AnimatedRoutes />
       <RecipeModal />
+      <MobileNavbar />
     </>
   )
 }

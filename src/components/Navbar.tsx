@@ -9,7 +9,7 @@ export const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 z-50 transition-colors duration-300">
+        <nav className="fixed top-0 left-0 right-0 h-14 md:h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 z-50 transition-colors duration-300">
             {/* Logo Section */}
             <div
                 className="flex items-center gap-2 cursor-pointer"

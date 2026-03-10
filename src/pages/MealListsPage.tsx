@@ -16,11 +16,11 @@ export const MealListsPage = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 transition-colors duration-300">
             {/* Header */}
-            <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-8 sticky top-0 z-10 transition-colors">
+            <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 py-4 md:px-6 md:py-8 sticky top-0 z-10 transition-colors">
                 <div className="max-w-[1920px] mx-auto flex items-end justify-between">
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">Mis Listas</h1>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-md">
+                        <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-1 md:mb-2">Mis Listas</h1>
+                        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-md">
                             Gestiona tus colecciones de recetas. Crea listas para ocasiones especiales, favoritos semanales o ideas para el futuro.
                         </p>
                     </div>

@@ -45,20 +45,21 @@ export const MenuDraftPage = () => {
             </AnimatePresence>
 
             {/* Header */}
-            <header className="bg-white border-b border-slate-100 sticky top-0 z-30 px-6 py-4 shadow-sm/50 backdrop-blur-md bg-white/90">
+            <header className="bg-white border-b border-slate-100 sticky top-0 z-30 px-4 py-3 md:px-6 md:py-4 shadow-sm/50 backdrop-blur-md bg-white/90">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 md:gap-4">
                         <button
                             onClick={() => navigate(-1)}
-                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+                            className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 transition-colors -ml-2 md:ml-0"
                         >
-                            <ArrowLeft size={22} />
+                            <ArrowLeft size={20} className="md:w-[22px] md:h-[22px]" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Borrador de Menú</h1>
-                            <p className="text-sm text-slate-500 font-medium flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                Semana del 12 al 18 de Enero
+                            <h1 className="text-lg md:text-2xl font-bold text-slate-900 tracking-tight leading-tight">Borrador de Menú</h1>
+                            <p className="text-xs md:text-sm text-slate-500 font-medium flex items-center gap-1.5 md:gap-2 mt-0.5 md:mt-0">
+                                <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span className="md:hidden">Semana del 12...</span>
+                                <span className="hidden md:inline">Semana del 12 al 18 de Enero</span>
                             </p>
                         </div>
                     </div>

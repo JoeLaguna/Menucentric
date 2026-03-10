@@ -29,7 +29,7 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot, hasBackground, isGhostMode
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="w-full h-full flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-7 gap-4 md:gap-3 2xl:gap-3 2xl:pb-0 pb-20 lg:pb-0"
+            className="w-full h-full flex overflow-x-auto hide-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-7 gap-4 md:gap-3 2xl:gap-3 2xl:pb-0 pb-20 lg:pb-0"
         >
             {dates.map((day, dayIndex) => (
                 <div
