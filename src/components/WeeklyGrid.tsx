@@ -29,7 +29,7 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot, hasBackground, isGhostMode
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="w-full h-full flex overflow-x-auto hide-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-7 gap-4 md:gap-3 2xl:gap-3 2xl:pb-0 pb-20 lg:pb-0"
+            className="w-full flex-1 h-full flex overflow-x-auto hide-scrollbar snap-x snap-mandatory lg:grid lg:grid-cols-7 gap-4 md:gap-3 2xl:gap-3 2xl:pb-0 pb-20 lg:pb-0"
         >
             {dates.map((day, dayIndex) => (
                 <div
@@ -68,7 +68,7 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot, hasBackground, isGhostMode
                     </div>
 
                     {/* Meal Slots */}
-                    <div className="flex-1 flex flex-col lg:pr-1 gap-3 lg:gap-2 xl:gap-3 2xl:gap-6">
+                    <div className="flex-1 flex flex-col gap-3 lg:gap-2 xl:gap-3 2xl:gap-6">
                         {MEALS.map((mealType, mealIndex) => {
                             const recipe = getRecipeForSlot(dayIndex, mealIndex);
 
@@ -96,7 +96,7 @@ export const WeeklyGrid = ({ dates, getRecipeForSlot, hasBackground, isGhostMode
                                         "lg:text-[8px]", // 1080p
                                         "xl:text-[9px]", // 1440p
                                         "2xl:text-sm", // 4K+
-                                        day.isToday ? "text-emerald-900/40 dark:text-emerald-100/40" : "text-slate-500/80 dark:text-slate-400"
+                                        day.isToday ? "text-emerald-400/80" : "text-slate-500/80 dark:text-slate-400"
                                     )}>
                                         {mealType === 'Media Mañana' ? 'Snack' : mealType}
                                     </span>

@@ -194,8 +194,8 @@ export const PlanPreviewPage = () => {
                 </div>
 
                 {/* Grid Container */}
-                <div className="flex-1 px-4 py-2 md:px-6 md:py-4 2xl:p-10 lg:overflow-y-auto lg:overflow-x-auto custom-scrollbar">
-                    <div className="w-full min-w-0 mx-auto h-full">
+                <div className="flex-1 flex flex-col p-4 md:p-6 2xl:p-10 lg:overflow-y-auto lg:overflow-x-hidden custom-scrollbar">
+                    <div className="w-full flex-1 min-w-0 mx-auto flex flex-col">
                         <WeeklyGrid
                             dates={dates}
                             getRecipeForSlot={getRecipeForSlot}
